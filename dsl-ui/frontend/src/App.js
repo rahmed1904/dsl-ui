@@ -8,9 +8,10 @@ import { ToastProvider, useToast } from './components/ToastProvider';
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 
-function App() {
+function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
     console.log("App.useEffect: Loading user...");
@@ -67,8 +68,18 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 
