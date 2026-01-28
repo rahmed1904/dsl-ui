@@ -41,7 +41,7 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
   const pageRows = filteredTransactions.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%' }} data-testid="transaction-reports">
+    <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%', fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial' }} data-testid="transaction-reports">
       <Box sx={{ mb: 3 }}>
         <Typography variant="h3" sx={{ mb: 0.5 }}>Transaction Report</Typography>
         <Typography variant="body2" color="text.secondary">
@@ -138,7 +138,7 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
                                 <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{tx.instrumentid}</TableCell>
                                 <TableCell sx={{ fontSize: '0.8125rem' }}>{tx.transactiontype}</TableCell>
                                 <TableCell align="right" sx={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600 }}>
-                                  ${parseFloat(tx.amount).toFixed(2)}
+                                  {parseFloat(tx.amount).toFixed(2)}
                                 </TableCell>
                               </TableRow>
                             ))}
@@ -216,7 +216,7 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
                     <TableCell sx={{ fontFamily: 'monospace' }}>{tx.subinstrumentid || '1'}</TableCell>
                     <TableCell>{tx.transactiontype}</TableCell>
                     <TableCell align="right" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                      ${parseFloat(tx.amount).toFixed(2)}
+                      {parseFloat(tx.amount).toFixed(2)}
                     </TableCell>
                     <TableCell sx={{ fontFamily: 'monospace' }}>{tx.effectivedate}</TableCell>
                   </TableRow>
