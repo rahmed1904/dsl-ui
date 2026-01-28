@@ -789,12 +789,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                             </TooltipContent>
                           </Tooltip>
                         </label>
-                        <Input
+                        <TextField
                           value={newFunction.example}
                           onChange={(e) => setNewFunction(prev => ({ ...prev, example: e.target.value }))}
                           placeholder="result = my_custom_function(1000, 0.05, 12)"
-                          className="font-mono text-sm"
+                          size="small"
+                          fullWidth
                           data-testid="function-example-input"
+                          InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
                         />
                       </div>
                     </div>
