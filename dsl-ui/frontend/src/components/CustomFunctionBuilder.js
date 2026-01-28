@@ -824,7 +824,7 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
           </div>
         </div>
       </div>
-    </TooltipProvider>
+    </div>
   );
 };
 
