@@ -342,7 +342,7 @@ const Dashboard = ({ onSignOut }) => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-x-hidden" data-testid="dashboard-container">
+    <div className="flex h-screen bg-[#F8F9FA] overflow-x-hidden" data-testid="dashboard-container">
       {/* Left Sidebar */}
       <LeftSidebar 
         events={events} 
@@ -354,12 +354,12 @@ const Dashboard = ({ onSignOut }) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <div className="bg-white border-b border-slate-200 px-6 py-4">
+        {/* Top Bar - Fyntrac style */}
+        <div className="bg-white border-b border-[#E9ECEF] px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Manrope' }}>DSL Studio</h1>
-              <p className="text-sm text-slate-600 mt-1">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
+              <h1 className="text-2xl font-bold text-[#212529] tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
+              <p className="text-sm text-[#6C757D] mt-1">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -368,12 +368,15 @@ const Dashboard = ({ onSignOut }) => {
                 onClick={() => setShowFunctionBrowser(true)}
                 data-testid="browse-functions-button"
                 title={`${dslFunctions.length} functions loaded`}
-                startIcon={<SearchIcon className="w-4 h-4 text-emerald-600" />}
+                startIcon={<SearchIcon className="w-4 h-4" />}
                 sx={{
-                  background: 'linear-gradient(to right, #ecfdf5, #ccfbf1)',
-                  borderColor: '#a7f3d0',
+                  bgcolor: '#D4EDDA',
+                  borderColor: '#C3E6CB',
+                  color: '#155724',
+                  fontWeight: 500,
                   '&:hover': {
-                    background: 'linear-gradient(to right, #d1fae5, #99f6e4)',
+                    bgcolor: '#C3E6CB',
+                    borderColor: '#B8DAFF',
                   },
                 }}
               >
@@ -384,12 +387,15 @@ const Dashboard = ({ onSignOut }) => {
                 size="small" 
                 onClick={() => setShowCustomFunctionBuilder(true)}
                 data-testid="custom-function-builder-button"
-                startIcon={<Brackets className="w-4 h-4 text-purple-600" />}
+                startIcon={<Brackets className="w-4 h-4" />}
                 sx={{
-                  background: 'linear-gradient(to right, #faf5ff, #ede9fe)',
-                  borderColor: '#e9d5ff',
+                  bgcolor: '#EEF0FE',
+                  borderColor: '#D4D6FA',
+                  color: '#5B5FED',
+                  fontWeight: 500,
                   '&:hover': {
-                    background: 'linear-gradient(to right, #f3e8ff, #ddd6fe)',
+                    bgcolor: '#E0E2FD',
+                    borderColor: '#5B5FED',
                   },
                 }}
               >
@@ -402,6 +408,15 @@ const Dashboard = ({ onSignOut }) => {
                 data-testid="settings-button"
                 startIcon={<Settings className="w-4 h-4" />}
                 endIcon={<ChevronDown className="w-3 h-3" />}
+                sx={{
+                  borderColor: '#CED4DA',
+                  color: '#495057',
+                  fontWeight: 500,
+                  '&:hover': {
+                    borderColor: '#ADB5BD',
+                    bgcolor: '#F8F9FA',
+                  },
+                }}
               >
                 Settings
               </Button>
@@ -410,6 +425,13 @@ const Dashboard = ({ onSignOut }) => {
                 open={Boolean(settingsAnchorEl)}
                 onClose={() => setSettingsAnchorEl(null)}
                 data-testid="settings-menu"
+                PaperProps={{
+                  sx: {
+                    borderRadius: '8px',
+                    border: '1px solid #E9ECEF',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  }
+                }}
               >
                 <MenuItem
                   onClick={() => {
@@ -417,8 +439,9 @@ const Dashboard = ({ onSignOut }) => {
                     setSettingsAnchorEl(null);
                   }}
                   data-testid="menu-sample-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Sparkles className="w-4 h-4 text-blue-600 mr-2" />
+                  <Sparkles className="w-4 h-4 text-[#5B5FED] mr-2" />
                   Test with Sample Data
                 </MenuItem>
                 <MenuItem
@@ -427,8 +450,9 @@ const Dashboard = ({ onSignOut }) => {
                     setSettingsAnchorEl(null);
                   }}
                   data-testid="menu-clear-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Trash2 className="w-4 h-4 text-red-600 mr-2" />
+                  <Trash2 className="w-4 h-4 text-[#DC3545] mr-2" />
                   Clear All Data
                 </MenuItem>
                 <MenuItem
@@ -437,8 +461,9 @@ const Dashboard = ({ onSignOut }) => {
                     setSettingsAnchorEl(null);
                   }}
                   data-testid="menu-view-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Database className="w-4 h-4 text-cyan-600 mr-2" />
+                  <Database className="w-4 h-4 text-[#17A2B8] mr-2" />
                   View Data
                 </MenuItem>
               </Menu>
