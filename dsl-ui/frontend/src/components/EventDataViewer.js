@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
-import { X, Database, Table, Download } from "lucide-react";
-import { Button, IconButton, Chip, Box } from '@mui/material';
+import { X, Database, Download } from "lucide-react";
+import { Button, IconButton, Chip, Box, Typography, Table, TableHead, TableBody, TableRow, TableCell, Card } from '@mui/material';
 
 const API = '/api';
 
@@ -63,153 +63,177 @@ const EventDataViewer = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" data-testid="event-data-viewer">
-      <div className="bg-white rounded-xl shadow-2xl w-[95vw] max-w-6xl h-[85vh] flex flex-col">
+    <Box 
+      sx={{ 
+        position: 'fixed', 
+        inset: 0, 
+        bgcolor: 'rgba(0,0,0,0.5)', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        zIndex: 1300 
+      }} 
+      data-testid="event-data-viewer"
+    >
+      <Card 
+        sx={{ 
+          width: '95vw', 
+          maxWidth: 1200, 
+          height: '85vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          borderRadius: 2
+        }}
+      >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-              <Database className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Manrope' }}>
-                Event Data Viewer
-              </h2>
-              <p className="text-sm text-slate-600">View uploaded event data by event type</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <IconButton onClick={onClose} data-testid="close-data-viewer">
-              <X className="w-5 h-5" />
-            </IconButton>
-          </div>
-        </div>
+        <Box sx={{ px: 3, py: 2.5, borderBottom: '1px solid #E9ECEF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#F8F9FA' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Database size={24} color="#5B5FED" />
+            <Box>
+              <Typography variant="h4">Event Data Viewer</Typography>
+              <Typography variant="body2" color="text.secondary">
+                View uploaded event data by event type
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={onClose} data-testid="close-data-viewer">
+            <X size={20} />
+          </IconButton>
+        </Box>
 
-        <div className="flex-1 flex overflow-hidden">
+        <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Left Panel - Event List */}
-          <div className="w-64 border-r border-slate-200 flex flex-col">
-            <div className="p-4 border-b border-slate-100">
-              <h3 className="font-semibold text-slate-800 text-sm">Events with Data</h3>
-            </div>
+          <Box sx={{ width: 280, borderRight: '1px solid #E9ECEF', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ p: 2, borderBottom: '1px solid #E9ECEF' }}>
+              <Typography variant="h6" sx={{ fontSize: '0.875rem' }}>Events with Data</Typography>
+            </Box>
             
-            <Box sx={{ flex: 1, overflowY: 'auto' }}>
+            <Box sx={{ flex: 1, overflowY: 'auto', p: 1.5 }}>
               {eventDataSummary.length === 0 ? (
-                <div className="p-4 text-center text-slate-500 text-sm">
-                  <Database className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-                  <p>No event data uploaded yet</p>
-                </div>
+                <Box sx={{ p: 2, textAlign: 'center' }}>
+                  <Database size={32} color="#CED4DA" style={{ marginBottom: 8 }} />
+                  <Typography variant="body2" color="text.secondary">No event data uploaded yet</Typography>
+                </Box>
               ) : (
-                <div className="p-2 space-y-1">
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {eventDataSummary.map((item) => (
-                    <div
+                    <Card
                       key={item.event_name}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        selectedEvent === item.event_name 
-                          ? 'bg-blue-100 border border-blue-300' 
-                          : 'hover:bg-slate-100'
-                      }`}
+                      sx={{
+                        p: 1.5,
+                        cursor: 'pointer',
+                        bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : 'transparent',
+                        border: '1px solid',
+                        borderColor: selectedEvent === item.event_name ? '#5B5FED' : '#E9ECEF',
+                        '&:hover': {
+                          bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : '#F8F9FA',
+                        },
+                      }}
                       onClick={() => loadEventData(item.event_name)}
                       data-testid={`event-data-item-${item.event_name}`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm text-slate-800">{item.event_name}</span>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: selectedEvent === item.event_name ? '#5B5FED' : '#212529' }}>
+                          {item.event_name}
+                        </Typography>
                         <Chip
                           label={`${item.row_count} rows`}
                           size="small"
-                          sx={{ fontSize: '0.75rem' }}
+                          sx={{ 
+                            fontSize: '0.6875rem',
+                            height: 20,
+                            bgcolor: selectedEvent === item.event_name ? '#5B5FED' : '#D4EDDA',
+                            color: selectedEvent === item.event_name ? '#FFFFFF' : '#155724',
+                          }}
                         />
-                      </div>
-                    </div>
+                      </Box>
+                    </Card>
                   ))}
-                </div>
+                </Box>
               )}
             </Box>
-          </div>
+          </Box>
 
           {/* Right Panel - Data Table */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {!selectedEvent ? (
-              <div className="flex-1 flex items-center justify-center text-slate-500">
-                <div className="text-center">
-                  <Table className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                  <p className="text-lg font-medium">Select an Event</p>
-                  <p className="text-sm mt-1">Click on an event to view its data</p>
-                </div>
-              </div>
+              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#F8F9FA' }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Database size={64} color="#CED4DA" style={{ marginBottom: 16 }} />
+                  <Typography variant="h5" sx={{ mb: 1 }}>Select an Event</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Click on an event to view its data
+                  </Typography>
+                </Box>
+              </Box>
             ) : loading ? (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
-              </div>
+              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></Box>
+              </Box>
             ) : (
               <>
                 {/* Data Header */}
-                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                  <div>
-                    <h3 className="font-semibold text-slate-800">{selectedEvent}</h3>
-                    <p className="text-xs text-slate-600">
+                <Box sx={{ p: 2, borderBottom: '1px solid #E9ECEF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#F8F9FA' }}>
+                  <Box>
+                    <Typography variant="h6">{selectedEvent}</Typography>
+                    <Typography variant="caption" color="text.secondary">
                       {eventData?.data_rows?.length || 0} rows × {getColumnHeaders().length} columns
-                    </p>
-                  </div>
+                    </Typography>
+                  </Box>
                   <Button 
                     variant="outlined" 
                     size="small" 
                     onClick={() => downloadEventData(selectedEvent)}
-                    startIcon={<Download className="w-4 h-4" />}
+                    startIcon={<Download size={16} />}
                     data-testid="download-event-data"
                   >
                     Download CSV
                   </Button>
-                </div>
+                </Box>
 
                 {/* Data Table */}
-                <div className="flex-1 overflow-auto p-4">
+                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
                   {eventData?.data_rows?.length > 0 ? (
-                    <table className="w-full text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-100">
-                          <th className="border border-slate-300 px-2 py-1.5 text-left font-semibold text-slate-700 sticky top-0 bg-slate-100">
-                            #
-                          </th>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600, bgcolor: '#F8F9FA' }}>#</TableCell>
                           {getColumnHeaders().map((header, idx) => (
-                            <th 
-                              key={idx} 
-                              className="border border-slate-300 px-2 py-1.5 text-left font-semibold text-slate-700 sticky top-0 bg-slate-100 whitespace-nowrap"
-                            >
+                            <TableCell key={idx} sx={{ fontWeight: 600, bgcolor: '#F8F9FA', whiteSpace: 'nowrap' }}>
                               {header}
-                            </th>
+                            </TableCell>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
                         {eventData.data_rows.map((row, rowIdx) => (
-                          <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                            <td className="border border-slate-200 px-2 py-1 text-slate-500 font-mono">
+                          <TableRow key={rowIdx} hover>
+                            <TableCell sx={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.8125rem' }}>
                               {rowIdx + 1}
-                            </td>
+                            </TableCell>
                             {getColumnHeaders().map((header, colIdx) => (
-                              <td 
-                                key={colIdx} 
-                                className="border border-slate-200 px-2 py-1 text-slate-700 whitespace-nowrap"
-                              >
+                              <TableCell key={colIdx} sx={{ fontFamily: 'monospace', fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
                                 {row[header]}
-                              </td>
+                              </TableCell>
                             ))}
-                          </tr>
+                          </TableRow>
                         ))}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   ) : (
-                    <div className="text-center py-8 text-slate-500">
-                      <p>No data rows found for this event</p>
-                    </div>
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        No data rows found for this event
+                      </Typography>
+                    </Box>
                   )}
-                </div>
+                </Box>
               </>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Card>
+    </Box>
   );
 };
 

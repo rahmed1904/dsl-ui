@@ -27,15 +27,24 @@ export default function ArtifactFetcherExample({ templateId }) {
   );
   
   if (!code) return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2, color: '#6C757D' }}>
       Loading artifact...
     </Box>
   );
 
   return (
-    <Box sx={{ p: 2, bgcolor: '#f8fafc' }}>
-      <h3 className="font-semibold mb-2">Artifact: {templateId}</h3>
-      <pre className="whitespace-pre-wrap text-sm">{code}</pre>
+    <Box sx={{ p: 2, bgcolor: '#F8F9FA' }}>
+      <Box component="h3" sx={{ fontWeight: 600, mb: 1, fontSize: '0.9375rem', color: '#212529' }}>Artifact: {templateId}</Box>
+      <Box component="pre" sx={{ 
+        whiteSpace: 'pre-wrap', 
+        fontSize: '0.8125rem',
+        fontFamily: 'monospace',
+        bgcolor: '#212529',
+        color: '#F8F9FA',
+        p: 2,
+        borderRadius: 1,
+        overflow: 'auto'
+      }}>{code}</Box>
     </Box>
   );
 }

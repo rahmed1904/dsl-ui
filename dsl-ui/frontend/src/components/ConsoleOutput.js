@@ -466,27 +466,29 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
   };
 
   return (
-    <div className="h-80 w-full max-w-full bg-slate-900 border-t border-slate-700 min-w-0 overflow-hidden" data-testid="console-output">
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+    <div className="h-80 w-full max-w-full bg-[#0D1117] border-t border-[#30363D] min-w-0 overflow-hidden" data-testid="console-output">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161B22] border-b border-[#30363D]">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-slate-400" />
-          <span className="text-sm font-semibold text-slate-300" style={{ fontFamily: 'Manrope' }}>Console</span>
+          <Terminal className="w-4 h-4 text-[#8B949E]" />
+          <span className="text-sm font-semibold text-[#E6EDF3]" style={{ fontFamily: 'Inter' }}>Console</span>
         </div>
         
-        <div className="flex items-center gap-2">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button
               variant="outlined"
               size="small"
               onClick={handleClearEditor}
-              startIcon={<X className="w-3 h-3" />}
+              startIcon={<X size={14} />}
               data-testid="clear-editor-button"
               sx={{
-                height: '28px',
-                bgcolor: '#334155',
-                color: '#cbd5e1',
-                borderColor: '#475569',
+                fontSize: '0.8125rem',
+                color: '#8B949E',
+                borderColor: '#30363D',
+                bgcolor: 'transparent',
                 '&:hover': {
-                  bgcolor: '#475569',
+                  borderColor: '#8B949E',
+                  bgcolor: 'rgba(139, 148, 158, 0.1)',
+                  color: '#E6EDF3',
                 },
               }}
             >
@@ -498,15 +500,21 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleImportInputs}
             disabled={!events || events.length === 0}
-            startIcon={<Download className="w-3 h-3" />}
+            startIcon={<Download size={14} />}
             data-testid="import-inputs-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
+              },
+              '&:disabled': {
+                color: '#484F58',
+                borderColor: '#21262D',
               },
             }}
           >
@@ -516,15 +524,17 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleSaveTemplate}
-            startIcon={<Save className="w-4 h-4" />}
+            startIcon={<Save size={14} />}
             data-testid="save-template-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
               },
             }}
           >
@@ -534,15 +544,17 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleBeautify}
-            startIcon={<Wand2 className="w-3 h-3" />}
+            startIcon={<Wand2 size={14} />}
             data-testid="beautify-code-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
               },
             }}
           >
@@ -553,13 +565,22 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleRunCode}
             disabled={running}
-            startIcon={<Play className="w-3 h-3" />}
+            startIcon={<Play size={14} />}
             data-testid="run-dsl-button"
             sx={{
-              height: '28px',
-              bgcolor: '#059669',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              bgcolor: '#14213D',
+              color: '#FFFFFF',
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(20, 33, 61, 0.3)',
               '&:hover': {
-                bgcolor: '#047857',
+                bgcolor: '#1D3557',
+                boxShadow: '0 4px 12px rgba(20, 33, 61, 0.4)',
+              },
+              '&:disabled': {
+                bgcolor: '#21262D',
+                color: '#484F58',
               },
             }}
           >
@@ -571,28 +592,30 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             onClick={onClear}
             data-testid="clear-console-button"
             sx={{
-              height: '28px',
-              color: '#94a3b8',
+              minWidth: 'auto',
+              p: 1,
+              color: '#8B949E',
               '&:hover': {
-                color: 'white',
+                color: '#F85149',
+                bgcolor: 'rgba(248, 81, 73, 0.1)',
               },
             }}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 size={16} />
           </Button>
-        </div>
+        </Box>
       </div>
       
-      <Box sx={{ height: 'calc(100% - 48px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
+      <Box sx={{ height: 'calc(100% - 52px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
         <div className="space-y-1 font-mono text-xs">
           {output.length === 0 ? (
-            <div className="text-slate-500">Console output will appear here... Click "Run" to execute DSL code</div>
+            <div className="text-[#484F58]">Console output will appear here... Click "Run" to execute DSL code</div>
           ) : (
             output.map((log, idx) => (
               <div key={idx} data-testid={`console-log-${idx}`}>
                 {log.type !== "print" && (
                   <div className="flex gap-2">
-                    <span className="text-slate-600">[{log.timestamp}]</span>
+                    <span className="text-[#484F58]">[{log.timestamp}]</span>
                     {renderLogMessage(log)}
                   </div>
                 )}
