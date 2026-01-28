@@ -17,18 +17,20 @@ The user requested a UI migration for their 'DSL Studio' application from shadcn
   - Primary purple: `#5B5FED`
   - Light background: `#F8F9FA`
   - Consistent typography with Inter font
-  - Rounded corners (8px default, 12px for cards)
+  - Rounded corners (10px buttons, 16px cards)
+- ✅ **Modern SaaS Styling** (Latest Update):
+  - Gradient buttons with hover lift effects
+  - Glass-morphism on header/cards (backdrop-blur)
+  - Smooth micro-animations (fadeInUp, scaleIn, float)
+  - Icon button scale animations
+  - Focus ring states
+  - Gradient text effect for titles
 - ✅ **Component Migration**: 15+ components migrated to MUI
-  - Login.js, Dashboard.js, LeftSidebar.js
-  - FileUploadPanel.js, TemplatesPanel.js, TransactionReports.js
-  - FunctionBrowser.js, ConsoleOutput.js, EventDataViewer.js
-  - ChatAssistant.js (fully styled with Fyntrac theme)
-- ✅ **Fyntrac UI Redesign**: Applied to all major components
-  - Left sidebar with Event Configuration panel
-  - Top bar with action buttons (Browse Functions, Build Function, Settings)
-  - AI Assistant panel with purple accents and card styling
-  - Console output with dark theme
-  - Tabs navigation with Fyntrac indicator
+- ✅ **CSS Animations**: Added to `/app/frontend/src/index.css`
+  - fadeInUp, fadeInLeft, fadeInRight
+  - scaleIn, shimmer, float, pulse-soft
+  - Stagger delays for list animations
+  - hover-lift utility class
 
 ## Tech Stack
 - **Frontend**: React 19, Material-UI 5.16, Tailwind CSS, Monaco Editor
