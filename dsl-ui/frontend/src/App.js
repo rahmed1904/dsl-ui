@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme/theme';
+import { ToastProvider, useToast } from './components/ToastProvider';
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-import { Toaster } from "./components/ui/sonner";
-import { toast } from "sonner";
 
 function App() {
   const [user, setUser] = useState(null);
