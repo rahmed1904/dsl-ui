@@ -355,10 +355,10 @@ const Dashboard = ({ onSignOut }) => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar - Fyntrac style */}
-        <div className="bg-white border-b border-[#E9ECEF] px-6 py-4">
+        <div className="bg-white/80 backdrop-blur-xl border-b border-[#E9ECEF]/50 px-6 py-4 animate-fade-in-up">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#212529] tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
+              <h1 className="text-2xl font-bold text-[#212529] tracking-tight gradient-text" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
               <p className="text-sm text-[#6C757D] mt-1">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
             </div>
             <div className="flex gap-2">
