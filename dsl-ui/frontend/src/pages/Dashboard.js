@@ -71,6 +71,7 @@ const Dashboard = ({ onSignOut }) => {
     loadDslFunctions();
     loadTemplates();
     loadTransactionReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist DSL editor content to localStorage whenever it changes
