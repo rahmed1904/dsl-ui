@@ -206,12 +206,17 @@ const DSLExamples = ({ onLoadExample }) => {
             color={selectedCategory === category ? "primary" : "default"}
             sx={{ 
               cursor: 'pointer',
-              bgcolor: selectedCategory === category ? '#14213D' : '#FFFFFF',
-              color: selectedCategory === category ? '#FFFFFF' : '#495057',
-              border: '1px solid',
-              borderColor: selectedCategory === category ? '#14213D' : '#CED4DA',
+              bgcolor: '#FFFFFF',
+              color: selectedCategory === category ? '#14213d' : '#495057',
+              border: 'none',
+              boxShadow: 'none',
+              outline: 'none',
               '&:hover': {
-                bgcolor: selectedCategory === category ? '#1D3557' : '#F8F9FA',
+                bgcolor: '#F8F9FA',
+              },
+              '&:focus, &:focus-visible': {
+                outline: 'none',
+                boxShadow: 'none',
               }
             }}
             data-testid={`example-category-${category}`}

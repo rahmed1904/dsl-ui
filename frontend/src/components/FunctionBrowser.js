@@ -91,13 +91,18 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
                 key={category}
                 label={category}
                 onClick={() => setSelectedCategory(category)}
-                color={selectedCategory === category ? "primary" : "default"}
                 sx={{ 
                   cursor: 'pointer',
-                  bgcolor: selectedCategory === category ? '#14213D' : '#FFFFFF',
-                  color: selectedCategory === category ? '#FFFFFF' : '#495057',
+                  bgcolor: selectedCategory === category ? '#EEF0FE' : '#FFFFFF',
+                  color: selectedCategory === category ? '#14213d' : '#495057',
+                  border: selectedCategory === category ? '1px solid #E9E6FB' : '1px solid #ECECEC',
+                  boxShadow: 'none',
                   '&:hover': {
-                    bgcolor: selectedCategory === category ? '#1D3557' : '#F8F9FA',
+                    bgcolor: selectedCategory === category ? '#E9ECFD' : '#F8F9FA',
+                  },
+                  '&:focus, &:focus-visible': {
+                    outline: 'none',
+                    boxShadow: 'none',
                   }
                 }}
                 data-testid={`category-${category}`}
