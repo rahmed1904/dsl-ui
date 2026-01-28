@@ -19,12 +19,13 @@ The user requested a UI migration for their 'DSL Studio' application from shadcn
   - Consistent typography with Inter font
   - Rounded corners (10px buttons, 16px cards)
 - ✅ **Modern SaaS Styling** (Latest Update):
+  - **Navy blue buttons (#14213D)** with white text across all components
   - Gradient buttons with hover lift effects
   - Glass-morphism on header/cards (backdrop-blur)
   - Smooth micro-animations (fadeInUp, scaleIn, float)
   - Icon button scale animations
   - Focus ring states
-  - Gradient text effect for titles
+  - Console dark theme with matching button styles
 - ✅ **Component Migration**: 15+ components migrated to MUI
 - ✅ **CSS Animations**: Added to `/app/frontend/src/index.css`
   - fadeInUp, fadeInLeft, fadeInRight
