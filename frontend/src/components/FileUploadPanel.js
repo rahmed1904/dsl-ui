@@ -52,6 +52,7 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
   }, []);
   const [uploading, setUploading] = useState(false);
   const [eventDataSummary, setEventDataSummary] = useState([]);
+  const [uploadErrors, setUploadErrors] = useState([]);
   const hasEvents = events && events.length > 0;
   const toast = useToast();
 
@@ -65,6 +66,54 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       }
     };
     loadSummary();
+
+    // load persisted upload errors and listen for updates
+    const loadErrors = () => {
+      try {
+        const raw = localStorage.getItem('lastEventDataUploadErrors');
+        const arr = raw ? JSON.parse(raw) : [];
+        setUploadErrors(arr || []);
+      } catch (e) {
+        setUploadErrors([]);
+      }
+    };
+    loadErrors();
+    const uploadErrorsHandler = (e) => {
+      try {
+        const detail = e?.detail || JSON.parse(localStorage.getItem('lastEventDataUploadErrors') || '[]');
+        setUploadErrors(detail || []);
+      } catch (err) {
+        setUploadErrors([]);
+      }
+    };
+
+    const refreshHandler = () => {
+      try { loadSummary(); } catch (e) {}
+    };
+
+    const clearViewerHandler = () => {
+      try {
+        setUploadedEventFileName('');
+        setUploadedExcelFileName('');
+        setLastFailedUploadFile('');
+        setLastUploadStatus(null);
+        localStorage.removeItem('uploadedEventFileName');
+        localStorage.removeItem('uploadedExcelFileName');
+        localStorage.removeItem('lastEventDataUploadFailedFile');
+        localStorage.removeItem('lastEventDataUploadStatus');
+        localStorage.removeItem('lastEventDataUploadFileName');
+        localStorage.removeItem('lastEventDataUploadErrors');
+      } catch (e) {}
+    };
+
+    window.addEventListener('dsl-refresh-event-data', refreshHandler);
+    window.addEventListener('dsl-clear-event-viewer', clearViewerHandler);
+    window.addEventListener('dsl-upload-errors', uploadErrorsHandler);
+    return () => {
+      window.removeEventListener('dsl-refresh-event-data', refreshHandler);
+      window.removeEventListener('dsl-clear-event-viewer', clearViewerHandler);
+      window.removeEventListener('dsl-upload-errors', uploadErrorsHandler);
+    };
   }, [events]);
 
   const handleUploadEvents = async () => {
@@ -73,11 +122,10 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       return;
     }
 
-    // Clear prior event viewer data and upload errors before starting a new upload
+    // Clear prior upload errors before starting a new upload
     try {
       localStorage.removeItem('lastEventDataUploadErrors');
       try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: [] })); } catch(e) {}
-      try { window.dispatchEvent(new Event('dsl-clear-event-viewer')); } catch(e) {}
     } catch(e) {}
 
     const formData = new FormData();
@@ -111,11 +159,10 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       return;
     }
 
-    // Clear prior event viewer data and upload errors before starting a new upload
+    // Clear prior upload errors before starting a new upload
     try {
       localStorage.removeItem('lastEventDataUploadErrors');
       try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: [] })); } catch(e) {}
-      try { window.dispatchEvent(new Event('dsl-clear-event-viewer')); } catch(e) {}
     } catch(e) {}
 
     const formData = new FormData();
@@ -328,7 +375,7 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
                     <IconButton
                       size="small"
                       onClick={() => { if (typeof onViewEvent === 'function' && selectedEvent) onViewEvent(selectedEvent); }}
-                      disabled={!(selectedEvent && eventDataSummary.some(it => it.event_name === selectedEvent && (it.row_count || 0) > 0))}
+                      disabled={!(selectedEvent && (eventDataSummary.some(it => it.event_name === selectedEvent && (it.row_count || 0) > 0) || uploadErrors.length > 0))}
                       data-testid="view-event-data-button"
                       sx={{ color: '#5B5FED' }}
                       aria-label="View event data"
