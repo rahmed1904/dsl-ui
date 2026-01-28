@@ -467,9 +467,9 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
 
   return (
     <div className="h-80 w-full max-w-full bg-[#0D1117] border-t border-[#30363D] min-w-0 overflow-hidden" data-testid="console-output">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161B22] border-b border-[#30363D]">
+      <div className="flex items-center justify-between px-4 py-1 bg-[#161B22] border-b border-[#30363D]">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-[#8B949E]" />
+          <Terminal className="w-3 h-3 text-[#8B949E]" />
           <span className="text-sm font-semibold text-[#E6EDF3]" style={{ fontFamily: 'Inter' }}>Console</span>
         </div>
         
@@ -478,10 +478,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
               variant="outlined"
               size="small"
               onClick={handleClearEditor}
-              startIcon={<X size={14} />}
+              startIcon={<X size={12} />}
               data-testid="clear-editor-button"
               sx={{
-                fontSize: '0.8125rem',
+                fontSize: '0.75rem',
+                minHeight: 28,
+                px: 1,
+                py: 0.25,
                 color: '#8B949E',
                 borderColor: '#30363D',
                 bgcolor: 'transparent',
@@ -500,10 +503,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleImportInputs}
             disabled={!events || events.length === 0}
-            startIcon={<Download size={14} />}
+            startIcon={<Download size={12} />}
             data-testid="import-inputs-button"
             sx={{
-              fontSize: '0.8125rem',
+              fontSize: '0.75rem',
+              minHeight: 28,
+              px: 1,
+              py: 0.25,
               color: '#8B949E',
               borderColor: '#30363D',
               bgcolor: 'transparent',
@@ -524,10 +530,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleSaveTemplate}
-            startIcon={<Save size={14} />}
+            startIcon={<Save size={12} />}
             data-testid="save-template-button"
             sx={{
-              fontSize: '0.8125rem',
+              fontSize: '0.75rem',
+              minHeight: 28,
+              px: 1,
+              py: 0.25,
               color: '#8B949E',
               borderColor: '#30363D',
               bgcolor: 'transparent',
@@ -544,10 +553,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleBeautify}
-            startIcon={<Wand2 size={14} />}
+            startIcon={<Wand2 size={12} />}
             data-testid="beautify-code-button"
             sx={{
-              fontSize: '0.8125rem',
+              fontSize: '0.75rem',
+              minHeight: 28,
+              px: 1,
+              py: 0.25,
               color: '#8B949E',
               borderColor: '#30363D',
               bgcolor: 'transparent',
@@ -565,11 +577,14 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleRunCode}
             disabled={running}
-            startIcon={<Play size={14} />}
+            startIcon={<Play size={12} />}
             data-testid="run-dsl-button"
             sx={{
               fontSize: '0.8125rem',
               fontWeight: 600,
+              minHeight: 28,
+              px: 1.25,
+              py: 0.25,
               bgcolor: '#14213D',
               color: '#FFFFFF',
               border: 'none',
@@ -593,7 +608,8 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             data-testid="clear-console-button"
             sx={{
               minWidth: 'auto',
-              p: 1,
+              px: 1,
+              py: 0.25,
               color: '#8B949E',
               '&:hover': {
                 color: '#F85149',
@@ -601,7 +617,7 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
               },
             }}
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </Button>
         </Box>
       </div>
