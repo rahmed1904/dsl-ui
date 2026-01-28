@@ -556,7 +556,7 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
             </div>
           )}
         </div>
-      </ScrollArea>
+      </Box>
 
       {/* Input - Copilot style */}
       <div className="p-3 border-t border-slate-100 bg-white">
