@@ -1,1 +1,253 @@
-import React, { useState, useMemo } from "react";\nimport { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';\nimport { Download, FileText, Clock, Trash2, TrendingUp, X as CloseIcon } from "lucide-react";\n\nconst PageSizeOptions = [10, 25, 50, 100];\n\nconst TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {\n  const [selectedReport, setSelectedReport] = useState(null);\n  const [pageSize, setPageSize] = useState(10);\n  const [pageIndex, setPageIndex] = useState(0);\n  const [filterText, setFilterText] = useState(\"\");\n  const [modalOpen, setModalOpen] = useState(false);\n\n  const displayReports = useMemo(() => {\n    const map = new Map();\n    (reports || []).forEach(r => map.set(r.template_name, r));\n    return Array.from(map.values());\n  }, [reports]);\n\n  const openReport = (report) => {\n    setSelectedReport(report);\n    setPageIndex(0);\n    setFilterText(\"\");\n    setModalOpen(true);\n  };\n\n  const filteredTransactions = useMemo(() => {\n    if (!selectedReport || !selectedReport.transactions) return [];\n    const txt = filterText.trim().toLowerCase();\n    if (!txt) return selectedReport.transactions;\n    return selectedReport.transactions.filter(tx => {\n      return (\n        (tx.instrumentid && String(tx.instrumentid).toLowerCase().includes(txt)) ||\n        (tx.subinstrumentid && String(tx.subinstrumentid).toLowerCase().includes(txt)) ||\n        (tx.transactiontype && String(tx.transactiontype).toLowerCase().includes(txt))\n      );\n    });\n  }, [selectedReport, filterText]);\n\n  const pageCount = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));\n  const pageRows = filteredTransactions.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);\n\n  return (\n    <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%' }} data-testid=\"transaction-reports\">\n      <Box sx={{ mb: 3 }}>\n        <Typography variant=\"h3\" sx={{ mb: 0.5 }}>Transaction Reports</Typography>\n        <Typography variant=\"body2\" color=\"text.secondary\">\n          View and download generated transaction reports\n        </Typography>\n      </Box>\n\n      {(!displayReports || displayReports.length === 0) ? (\n        <Card sx={{ textAlign: 'center', py: 6 }}>\n          <CardContent>\n            <TrendingUp size={48} color=\"#CED4DA\" style={{ marginBottom: 16 }} />\n            <Typography variant=\"h5\" sx={{ mb: 1 }}>No Transaction Reports</Typography>\n            <Typography variant=\"body2\" color=\"text.secondary\">\n              Execute templates to generate transaction reports\n            </Typography>\n          </CardContent>\n        </Card>\n      ) : (\n        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>\n          {displayReports.map((report) => (\n            <Card key={report.id || report.template_name} data-testid={`report-${report.id}`}>\n              <CardContent sx={{ p: 3 }}>\n                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>\n                  <Box>\n                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>\n                      <FileText size={20} color=\"#5B5FED\" />\n                      <Typography variant=\"h5\">{report.template_name}</Typography>\n                    </Box>\n                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>\n                      <Typography variant=\"body2\" color=\"text.secondary\">\n                        Event: <Box component=\"span\" sx={{ fontFamily: 'monospace', color: '#495057' }}>{report.event_name}</Box>\n                      </Typography>\n                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>\n                        <Clock size={12} color=\"#6C757D\" />\n                        <Typography variant=\"caption\" color=\"text.secondary\">\n                          {report.executed_at ? new Date(report.executed_at).toLocaleString() : ''}\n                        </Typography>\n                      </Box>\n                    </Box>\n                  </Box>\n                  <Box sx={{ display: 'flex', gap: 1 }}>\n                    <Button \n                      size=\"small\" \n                      variant=\"outlined\"\n                      onClick={() => openReport(report)} \n                      data-testid={`open-report-${report.id}`}\n                    >\n                      View Details\n                    </Button>\n                    <IconButton\n                      size=\"small\"\n                      onClick={() => onDeleteReport(report.id, report.template_name)}\n                      sx={{ color: '#DC3545' }}\n                      data-testid={`delete-report-${report.id}`}\n                    >\n                      <Trash2 size={16} />\n                    </IconButton>\n                  </Box>\n                </Box>\n\n                <Card sx={{ bgcolor: '#F8F9FA', border: '1px solid #E9ECEF' }}>\n                  <CardContent sx={{ p: 2.5 }}>\n                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>\n                      <Box>\n                        <Typography variant=\"body2\" sx={{ fontWeight: 600, mb: 0.5 }}>Generated Transactions</Typography>\n                        <Typography variant=\"caption\" color=\"text.secondary\">Click \"View Details\" to see full report</Typography>\n                      </Box>\n                      <Chip \n                        label={`${report.transactions.length} transactions`}\n                        sx={{ \n                          bgcolor: '#D4EDDA',\n                          color: '#155724',\n                          fontWeight: 600,\n                          fontSize: '0.875rem'\n                        }}\n                      />\n                    </Box>\n\n                    {report.transactions.length > 0 && (\n                      <Box sx={{ overflowX: 'auto' }}>\n                        <Table size=\"small\">\n                          <TableHead>\n                            <TableRow>\n                              <TableCell>Posting Date</TableCell>\n                              <TableCell>Instrument</TableCell>\n                              <TableCell>Type</TableCell>\n                              <TableCell align=\"right\">Amount</TableCell>\n                            </TableRow>\n                          </TableHead>\n                          <TableBody>\n                            {report.transactions.slice(0, 5).map((tx, idx) => (\n                              <TableRow key={idx} hover>\n                                <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{tx.postingdate}</TableCell>\n                                <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{tx.instrumentid}</TableCell>\n                                <TableCell sx={{ fontSize: '0.8125rem' }}>{tx.transactiontype}</TableCell>\n                                <TableCell align=\"right\" sx={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600 }}>\n                                  ${parseFloat(tx.amount).toFixed(2)}\n                                </TableCell>\n                              </TableRow>\n                            ))}\n                          </TableBody>\n                        </Table>\n                        {report.transactions.length > 5 && (\n                          <Typography variant=\"caption\" color=\"text.secondary\" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>\n                            + {report.transactions.length - 5} more transactions\n                          </Typography>\n                        )}\n                      </Box>\n                    )}\n                  </CardContent>\n                </Card>\n\n                <Box sx={{ mt: 2 }}>\n                  <Button \n                    variant=\"contained\"\n                    size=\"small\" \n                    onClick={() => onDownloadReport(report.id)}\n                    startIcon={<Download size={16} />}\n                    data-testid={`download-report-${report.id}`}\n                  >\n                    Download CSV\n                  </Button>\n                </Box>\n              </CardContent>\n            </Card>\n          ))}\n        </Box>\n      )}\n\n      {/* Modal for full report view */}\n      <Dialog \n        open={modalOpen} \n        onClose={() => setModalOpen(false)} \n        maxWidth=\"lg\" \n        fullWidth\n      >\n        <DialogTitle>\n          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>\n            <Typography variant=\"h4\">{selectedReport ? `${selectedReport.template_name} — Transactions` : 'Transactions'}</Typography>\n            <IconButton onClick={() => setModalOpen(false)} size=\"small\">\n              <CloseIcon size={20} />\n            </IconButton>\n          </Box>\n        </DialogTitle>\n        <DialogContent>\n          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>\n            <TextField \n              value={filterText} \n              onChange={e => setFilterText(e.target.value)} \n              placeholder=\"Filter transactions...\" \n              size=\"small\"\n              fullWidth\n            />\n            <Select \n              value={pageSize} \n              onChange={e => { setPageSize(parseInt(e.target.value, 10)); setPageIndex(0); }} \n              size=\"small\"\n              sx={{ minWidth: 120 }}\n            >\n              {PageSizeOptions.map(s => <MenuItem key={s} value={s}>{s} per page</MenuItem>)}\n            </Select>\n          </Box>\n\n          <Box sx={{ overflowX: 'auto' }}>\n            <Table>\n              <TableHead>\n                <TableRow>\n                  <TableCell>Posting Date</TableCell>\n                  <TableCell>Instrument ID</TableCell>\n                  <TableCell>Sub-Instrument</TableCell>\n                  <TableCell>Type</TableCell>\n                  <TableCell align=\"right\">Amount</TableCell>\n                  <TableCell>Effective Date</TableCell>\n                </TableRow>\n              </TableHead>\n              <TableBody>\n                {pageRows.map((tx, i) => (\n                  <TableRow key={i} hover>\n                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.postingdate}</TableCell>\n                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.instrumentid}</TableCell>\n                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.subinstrumentid || '1'}</TableCell>\n                    <TableCell>{tx.transactiontype}</TableCell>\n                    <TableCell align=\"right\" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>\n                      ${parseFloat(tx.amount).toFixed(2)}\n                    </TableCell>\n                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.effectivedate}</TableCell>\n                  </TableRow>\n                ))}\n              </TableBody>\n            </Table>\n          </Box>\n\n          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>\n            <Typography variant=\"body2\" color=\"text.secondary\">\n              Showing {filteredTransactions.length} transactions — page {pageIndex + 1} of {pageCount}\n            </Typography>\n            <Box sx={{ display: 'flex', gap: 1 }}>\n              <Button size=\"small\" onClick={() => setPageIndex(0)} disabled={pageIndex === 0}>First</Button>\n              <Button size=\"small\" onClick={() => setPageIndex(p => Math.max(0, p - 1))} disabled={pageIndex === 0}>Prev</Button>\n              <Button size=\"small\" onClick={() => setPageIndex(p => Math.min(pageCount - 1, p + 1))} disabled={pageIndex >= pageCount - 1}>Next</Button>\n              <Button size=\"small\" onClick={() => setPageIndex(pageCount - 1)} disabled={pageIndex >= pageCount - 1}>Last</Button>\n            </Box>\n          </Box>\n        </DialogContent>\n      </Dialog>\n    </Box>\n  );\n};\n\nexport default TransactionReports;
+import React, { useState, useMemo } from "react";
+import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import { Download, FileText, Clock, Trash2, TrendingUp, X as CloseIcon } from "lucide-react";
+
+const PageSizeOptions = [10, 25, 50, 100];
+
+const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [filterText, setFilterText] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const displayReports = useMemo(() => {
+    const map = new Map();
+    (reports || []).forEach(r => map.set(r.template_name, r));
+    return Array.from(map.values());
+  }, [reports]);
+
+  const openReport = (report) => {
+    setSelectedReport(report);
+    setPageIndex(0);
+    setFilterText("");
+    setModalOpen(true);
+  };
+
+  const filteredTransactions = useMemo(() => {
+    if (!selectedReport || !selectedReport.transactions) return [];
+    const txt = filterText.trim().toLowerCase();
+    if (!txt) return selectedReport.transactions;
+    return selectedReport.transactions.filter(tx => {
+      return (
+        (tx.instrumentid && String(tx.instrumentid).toLowerCase().includes(txt)) ||
+        (tx.subinstrumentid && String(tx.subinstrumentid).toLowerCase().includes(txt)) ||
+        (tx.transactiontype && String(tx.transactiontype).toLowerCase().includes(txt))
+      );
+    });
+  }, [selectedReport, filterText]);
+
+  const pageCount = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const pageRows = filteredTransactions.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+
+  return (
+    <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%' }} data-testid="transaction-reports">
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h3" sx={{ mb: 0.5 }}>Transaction Reports</Typography>
+        <Typography variant="body2" color="text.secondary">
+          View and download generated transaction reports
+        </Typography>
+      </Box>
+
+      {(!displayReports || displayReports.length === 0) ? (
+        <Card sx={{ textAlign: 'center', py: 6 }}>
+          <CardContent>
+            <TrendingUp size={48} color="#CED4DA" style={{ marginBottom: 16 }} />
+            <Typography variant="h5" sx={{ mb: 1 }}>No Transaction Reports</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Execute templates to generate transaction reports
+            </Typography>
+          </CardContent>
+        </Card>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          {displayReports.map((report) => (
+            <Card key={report.id || report.template_name} data-testid={`report-${report.id}`}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2.5 }}>
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <FileText size={20} color="#5B5FED" />
+                      <Typography variant="h5">{report.template_name}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Event: <Box component="span" sx={{ fontFamily: 'monospace', color: '#495057' }}>{report.event_name}</Box>
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Clock size={12} color="#6C757D" />
+                        <Typography variant="caption" color="text.secondary">
+                          {report.executed_at ? new Date(report.executed_at).toLocaleString() : ''}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button 
+                      size="small" 
+                      variant="outlined"
+                      onClick={() => openReport(report)} 
+                      data-testid={`open-report-${report.id}`}
+                    >
+                      View Details
+                    </Button>
+                    <IconButton
+                      size="small"
+                      onClick={() => onDeleteReport(report.id, report.template_name)}
+                      sx={{ color: '#DC3545' }}
+                      data-testid={`delete-report-${report.id}`}
+                    >
+                      <Trash2 size={16} />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                <Card sx={{ bgcolor: '#F8F9FA', border: '1px solid #E9ECEF' }}>
+                  <CardContent sx={{ p: 2.5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>Generated Transactions</Typography>
+                        <Typography variant="caption" color="text.secondary">Click "View Details" to see full report</Typography>
+                      </Box>
+                      <Chip 
+                        label={`${report.transactions.length} transactions`}
+                        sx={{ 
+                          bgcolor: '#D4EDDA',
+                          color: '#155724',
+                          fontWeight: 600,
+                          fontSize: '0.875rem'
+                        }}
+                      />
+                    </Box>
+
+                    {report.transactions.length > 0 && (
+                      <Box sx={{ overflowX: 'auto' }}>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Posting Date</TableCell>
+                              <TableCell>Instrument</TableCell>
+                              <TableCell>Type</TableCell>
+                              <TableCell align="right">Amount</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {report.transactions.slice(0, 5).map((tx, idx) => (
+                              <TableRow key={idx} hover>
+                                <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{tx.postingdate}</TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{tx.instrumentid}</TableCell>
+                                <TableCell sx={{ fontSize: '0.8125rem' }}>{tx.transactiontype}</TableCell>
+                                <TableCell align="right" sx={{ fontFamily: 'monospace', fontSize: '0.8125rem', fontWeight: 600 }}>
+                                  ${parseFloat(tx.amount).toFixed(2)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        {report.transactions.length > 5 && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>
+                            + {report.transactions.length - 5} more transactions
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Box sx={{ mt: 2 }}>
+                  <Button 
+                    variant="contained"
+                    size="small" 
+                    onClick={() => onDownloadReport(report.id)}
+                    startIcon={<Download size={16} />}
+                    data-testid={`download-report-${report.id}`}
+                  >
+                    Download CSV
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      )}
+
+      <Dialog 
+        open={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        maxWidth="lg" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h4">{selectedReport ? `${selectedReport.template_name} — Transactions` : 'Transactions'}</Typography>
+            <IconButton onClick={() => setModalOpen(false)} size="small">
+              <CloseIcon size={20} />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <TextField 
+              value={filterText} 
+              onChange={e => setFilterText(e.target.value)} 
+              placeholder="Filter transactions..." 
+              size="small"
+              fullWidth
+            />
+            <Select 
+              value={pageSize} 
+              onChange={e => { setPageSize(parseInt(e.target.value, 10)); setPageIndex(0); }} 
+              size="small"
+              sx={{ minWidth: 120 }}
+            >
+              {PageSizeOptions.map(s => <MenuItem key={s} value={s}>{s} per page</MenuItem>)}
+            </Select>
+          </Box>
+
+          <Box sx={{ overflowX: 'auto' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Posting Date</TableCell>
+                  <TableCell>Instrument ID</TableCell>
+                  <TableCell>Sub-Instrument</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell>Effective Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {pageRows.map((tx, i) => (
+                  <TableRow key={i} hover>
+                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.postingdate}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.instrumentid}</TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.subinstrumentid || '1'}</TableCell>
+                    <TableCell>{tx.transactiontype}</TableCell>
+                    <TableCell align="right" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                      ${parseFloat(tx.amount).toFixed(2)}
+                    </TableCell>
+                    <TableCell sx={{ fontFamily: 'monospace' }}>{tx.effectivedate}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              Showing {filteredTransactions.length} transactions — page {pageIndex + 1} of {pageCount}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button size="small" onClick={() => setPageIndex(0)} disabled={pageIndex === 0}>First</Button>
+              <Button size="small" onClick={() => setPageIndex(p => Math.max(0, p - 1))} disabled={pageIndex === 0}>Prev</Button>
+              <Button size="small" onClick={() => setPageIndex(p => Math.min(pageCount - 1, p + 1))} disabled={pageIndex >= pageCount - 1}>Next</Button>
+              <Button size="small" onClick={() => setPageIndex(pageCount - 1)} disabled={pageIndex >= pageCount - 1}>Last</Button>
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default TransactionReports;
