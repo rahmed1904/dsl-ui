@@ -350,13 +350,15 @@ const Dashboard = ({ onSignOut }) => {
   return (
     <div className="flex h-screen bg-[#F8F9FA] overflow-x-hidden" data-testid="dashboard-container">
       {/* Left Sidebar */}
-      <LeftSidebar 
-        events={events} 
-        selectedEvent={selectedEvent}
-        onEventSelect={setSelectedEvent}
-        onDownloadEvents={handleDownloadEvents}
-        onSignOut={onSignOut}
-      />
+      <div className="sidebar-enter">
+        <LeftSidebar 
+          events={events} 
+          selectedEvent={selectedEvent}
+          onEventSelect={setSelectedEvent}
+          onDownloadEvents={handleDownloadEvents}
+          onSignOut={onSignOut}
+        />
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
