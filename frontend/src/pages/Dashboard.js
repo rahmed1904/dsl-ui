@@ -42,9 +42,9 @@ const Dashboard = ({ onSignOut }) => {
   const [dslCode, setDslCode] = useState(() => {
     try {
       const saved = localStorage.getItem('dslCode');
-      return saved || \"## Welcome to Fyntac DSL Code Editor ##\";
+      return saved || "## Welcome to Fyntac DSL Code Editor ##";
     } catch (e) {
-      return \"## Welcome to Fyntac DSL Code Editor ##\";
+      return "## Welcome to Fyntac DSL Code Editor ##";
     }
   });
   const [consoleOutput, setConsoleOutput] = useState([]);
