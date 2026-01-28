@@ -582,12 +582,8 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Function Name <span className="text-red-500">*</span>
                           <Tooltip>
-                            <TooltipTrigger>
-                              <HelpCircle className="w-3 h-3 text-slate-400" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              <p>Use snake_case: lowercase letters with underscores. Example: calculate_interest</p>
-                            </TooltipContent>
+                          <Tooltip title="Use snake_case: lowercase letters with underscores. Example: calculate_interest">
+                            <HelpCircle className="w-3 h-3 text-slate-400" />
                           </Tooltip>
                         </label>
                         <TextField
