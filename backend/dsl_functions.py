@@ -910,7 +910,10 @@ def end_of_month(d: str) -> str:
     nd = normalize_date(d)
     if not nd:
         return ''
-    date = datetime.fromisoformat(nd)
+    try:
+        date = datetime.fromisoformat(nd)
+    except Exception:
+        return ''
     if date.month == 12:
         next_month = datetime(date.year + 1, 1, 1)
     else:
