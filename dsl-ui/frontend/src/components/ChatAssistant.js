@@ -416,21 +416,13 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
           <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-100">
             <p className="text-xs font-medium text-blue-900 mb-2">Context</p>
             <div className="flex flex-wrap gap-1 mb-2">
-              <Badge variant="secondary" className="text-xs bg-white border border-slate-200 text-slate-700">
-                {contextSummary.eventsCount} Events
-              </Badge>
-              <Badge variant="secondary" className="text-xs bg-white border border-slate-200 text-slate-700">
-                {contextSummary.functionsCount} Functions
-              </Badge>
+              <Chip label={`${contextSummary.eventsCount} Events`} size="small" sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', color: '#334155', fontSize: '0.75rem' }} />
+              <Chip label={`${contextSummary.functionsCount} Functions`} size="small" sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', color: '#334155', fontSize: '0.75rem' }} />
               {contextSummary.hasEditorCode && (
-                <Badge variant="secondary" className="text-xs bg-green-50 border border-green-200 text-green-700">
-                  Editor
-                </Badge>
+                <Chip label="Editor" size="small" sx={{ bgcolor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', fontSize: '0.75rem' }} />
               )}
               {contextSummary.consoleLogsCount > 0 && (
-                <Badge variant="secondary" className="text-xs bg-amber-50 border border-amber-200 text-amber-700">
-                  Console
-                </Badge>
+                <Chip label="Console" size="small" sx={{ bgcolor: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', fontSize: '0.75rem' }} />
               )}
             </div>
           </div>
