@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
+import { Button, Box } from '@mui/material';
 import { Trash2, Terminal, Play, Table2, Code, Wand2, Download, Save, X } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 
 const API = '/api';
 
