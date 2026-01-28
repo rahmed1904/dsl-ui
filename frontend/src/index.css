@@ -342,7 +342,9 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* Prevent accidental horizontal page overflow; console and other areas should scroll internally */
+/* Allow horizontal scroll when window is smaller than min-width */
 html, body, #root {
-    overflow-x: hidden;
+    min-width: 1400px;
+    overflow-x: auto;
+    overflow-y: auto;
 }
