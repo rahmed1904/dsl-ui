@@ -576,9 +576,19 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
           <Button 
             onClick={handleSendMessage} 
             disabled={!input.trim() || loading}
-            size="sm"
-            className="m-2 h-7 w-7 p-0 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 rounded transition-colors duration-200"
+            size="small"
+            variant="contained"
             data-testid="send-message-button"
+            sx={{
+              m: 1,
+              minWidth: 'auto',
+              height: '28px',
+              width: '28px',
+              p: 0,
+              bgcolor: '#2563eb',
+              '&:hover': { bgcolor: '#1d4ed8' },
+              '&:disabled': { bgcolor: '#cbd5e1', color: '#64748b' }
+            }}
           >
             <Send className="w-3.5 h-3.5" />
           </Button>
