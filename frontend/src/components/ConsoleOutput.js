@@ -466,11 +466,11 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
   };
 
   return (
-    <div className="h-80 w-full max-w-full bg-slate-900 border-t border-slate-700 min-w-0 overflow-hidden" data-testid="console-output">
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+    <div className="h-80 w-full max-w-full bg-[#0D1117] border-t border-[#30363D] min-w-0 overflow-hidden" data-testid="console-output">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161B22] border-b border-[#30363D]">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-slate-400" />
-          <span className="text-sm font-semibold text-slate-300" style={{ fontFamily: 'Manrope' }}>Console</span>
+          <Terminal className="w-4 h-4 text-[#8B949E]" />
+          <span className="text-sm font-semibold text-[#E6EDF3]" style={{ fontFamily: 'Inter' }}>Console</span>
         </div>
         
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -482,11 +482,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
               data-testid="clear-editor-button"
               sx={{
                 fontSize: '0.8125rem',
-                color: '#6C757D',
-                borderColor: '#CED4DA',
+                color: '#8B949E',
+                borderColor: '#30363D',
+                bgcolor: 'transparent',
                 '&:hover': {
-                  borderColor: '#ADB5BD',
-                  bgcolor: '#F8F9FA',
+                  borderColor: '#8B949E',
+                  bgcolor: 'rgba(139, 148, 158, 0.1)',
+                  color: '#E6EDF3',
                 },
               }}
             >
@@ -502,11 +504,17 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             data-testid="import-inputs-button"
             sx={{
               fontSize: '0.8125rem',
-              color: '#6C757D',
-              borderColor: '#CED4DA',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                borderColor: '#ADB5BD',
-                bgcolor: '#F8F9FA',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
+              },
+              '&:disabled': {
+                color: '#484F58',
+                borderColor: '#21262D',
               },
             }}
           >
@@ -520,11 +528,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             data-testid="save-template-button"
             sx={{
               fontSize: '0.8125rem',
-              color: '#6C757D',
-              borderColor: '#CED4DA',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                borderColor: '#ADB5BD',
-                bgcolor: '#F8F9FA',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
               },
             }}
           >
@@ -538,11 +548,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             data-testid="beautify-code-button"
             sx={{
               fontSize: '0.8125rem',
-              color: '#6C757D',
-              borderColor: '#CED4DA',
+              color: '#8B949E',
+              borderColor: '#30363D',
+              bgcolor: 'transparent',
               '&:hover': {
-                borderColor: '#ADB5BD',
-                bgcolor: '#F8F9FA',
+                borderColor: '#8B949E',
+                bgcolor: 'rgba(139, 148, 158, 0.1)',
+                color: '#E6EDF3',
               },
             }}
           >
@@ -557,9 +569,18 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             data-testid="run-dsl-button"
             sx={{
               fontSize: '0.8125rem',
-              bgcolor: '#5B5FED',
+              fontWeight: 600,
+              bgcolor: '#14213D',
+              color: '#FFFFFF',
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(20, 33, 61, 0.3)',
               '&:hover': {
-                bgcolor: '#4346C8',
+                bgcolor: '#1D3557',
+                boxShadow: '0 4px 12px rgba(20, 33, 61, 0.4)',
+              },
+              '&:disabled': {
+                bgcolor: '#21262D',
+                color: '#484F58',
               },
             }}
           >
@@ -573,10 +594,10 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             sx={{
               minWidth: 'auto',
               p: 1,
-              color: '#6C757D',
+              color: '#8B949E',
               '&:hover': {
-                color: '#DC3545',
-                bgcolor: '#FFF5F6',
+                color: '#F85149',
+                bgcolor: 'rgba(248, 81, 73, 0.1)',
               },
             }}
           >
@@ -585,16 +606,16 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
         </Box>
       </div>
       
-      <Box sx={{ height: 'calc(100% - 48px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
+      <Box sx={{ height: 'calc(100% - 52px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
         <div className="space-y-1 font-mono text-xs">
           {output.length === 0 ? (
-            <div className="text-slate-500">Console output will appear here... Click "Run" to execute DSL code</div>
+            <div className="text-[#484F58]">Console output will appear here... Click "Run" to execute DSL code</div>
           ) : (
             output.map((log, idx) => (
               <div key={idx} data-testid={`console-log-${idx}`}>
                 {log.type !== "print" && (
                   <div className="flex gap-2">
-                    <span className="text-slate-600">[{log.timestamp}]</span>
+                    <span className="text-[#484F58]">[{log.timestamp}]</span>
                     {renderLogMessage(log)}
                   </div>
                 )}
