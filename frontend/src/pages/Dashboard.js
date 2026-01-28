@@ -696,7 +696,7 @@ const Dashboard = ({ onSignOut }) => {
           </Box>
 
           {/* Right Sidebar - Chat Assistant */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 chat-panel-enter">
             <ChatAssistant 
               ref={chatAssistantRef}
               dslFunctions={dslFunctions} 
