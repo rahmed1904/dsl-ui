@@ -3186,205 +3186,32 @@ This calculates monthly compound interest and emits a transaction with the resul
 @api_router.get("/custom-functions")
 async def get_custom_functions():
     """Get all custom user-defined functions"""
-    try:
-        functions = await db.custom_functions.find({}, {"_id": 0}).to_list(1000)
-        for func in functions:
-            if isinstance(func.get('created_at'), str):
-                func['created_at'] = datetime.fromisoformat(func['created_at'])
-        return functions
-    except Exception:
-        logger.warning("DB unavailable when fetching custom functions, returning in-memory list")
-        return in_memory_data.get('custom_functions', [])
+    # Custom functions feature removed; return 404 to indicate endpoint unavailable
+    raise HTTPException(status_code=404, detail="Custom functions feature has been removed")
 
 @api_router.post("/custom-functions")
 async def create_custom_function(func_data: CustomFunctionCreate):
     """Create a new custom function"""
-    try:
-        # Validate function name doesn't conflict with built-in functions
-        builtin_names = [f['name'].lower() for f in DSL_FUNCTION_METADATA]
-        if func_data.name.lower() in builtin_names:
-            raise HTTPException(status_code=400, detail=f"Function name '{func_data.name}' conflicts with a built-in function")
-        
-        # Check for duplicate custom function names
-        try:
-            existing = await db.custom_functions.find_one({"name": func_data.name})
-            if existing:
-                raise HTTPException(status_code=400, detail=f"A custom function named '{func_data.name}' already exists")
-        except Exception:
-            # DB unavailable - check in-memory
-            if any(f.get('name', '').lower() == func_data.name.lower() for f in in_memory_data.get('custom_functions', [])):
-                raise HTTPException(status_code=400, detail=f"A custom function named '{func_data.name}' already exists")
-        
-        # Create the custom function
-        custom_func = CustomFunction(
-            name=func_data.name,
-            category=func_data.category,
-            description=func_data.description,
-            parameters=func_data.parameters,
-            return_type=func_data.returnType,
-            formula=func_data.formula,
-            example=func_data.example
-        )
-        
-        doc = custom_func.model_dump()
-        doc['created_at'] = doc['created_at'].isoformat()
-        try:
-            await db.custom_functions.insert_one(doc)
-            # Also register the function in the DSL runtime
-            await register_custom_function_runtime(custom_func)
-            return {"message": "Custom function created successfully", "id": custom_func.id}
-        except Exception as e:
-            # Persist in-memory and register runtime
-            logger.warning(f"DB unavailable when creating custom function, saving in-memory: {e}")
-            in_memory_data.setdefault('custom_functions', []).append(doc)
-            try:
-                await register_custom_function_runtime(custom_func)
-            except Exception as re:
-                logger.error(f"Failed to register custom function runtime: {re}")
-            # Return the same success message so tests don't depend on storage location
-            return {"message": "Custom function created successfully", "id": custom_func.id}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error creating custom function: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+    # Custom functions feature removed
+    raise HTTPException(status_code=404, detail="Custom functions feature has been removed")
 
 @api_router.delete("/custom-functions/{function_id}")
 async def delete_custom_function(function_id: str):
     """Delete a custom function"""
-    try:
-        result = await db.custom_functions.delete_one({"id": function_id})
-        if getattr(result, 'deleted_count', 0) == 0:
-            # Not found in DB - try in-memory
-            before = len(in_memory_data.get('custom_functions', []))
-            removed = [f for f in in_memory_data.get('custom_functions', []) if f.get('id') == function_id or f.get('name') == function_id]
-            in_memory_data['custom_functions'] = [f for f in in_memory_data.get('custom_functions', []) if f.get('id') != function_id and f.get('name') != function_id]
-            after = len(in_memory_data.get('custom_functions', []))
-            if after < before:
-                # Also remove from runtime for each removed function by name
-                for f in removed:
-                    try:
-                        name = f.get('name')
-                        if name and name in DSL_FUNCTIONS:
-                            DSL_FUNCTIONS.pop(name, None)
-                    except Exception:
-                        logger.debug(f"Failed to remove runtime entry for custom function {f}")
-                return {"message": "Custom function deleted successfully"}
-            raise HTTPException(status_code=404, detail="Custom function not found")
-        return {"message": "Custom function deleted successfully"}
-    except Exception:
-        # DB unavailable - remove in-memory entry
-        before = len(in_memory_data.get('custom_functions', []))
-        removed = [f for f in in_memory_data.get('custom_functions', []) if f.get('id') == function_id or f.get('name') == function_id]
-        in_memory_data['custom_functions'] = [f for f in in_memory_data.get('custom_functions', []) if f.get('id') != function_id and f.get('name') != function_id]
-        after = len(in_memory_data.get('custom_functions', []))
-        if after < before:
-            for f in removed:
-                try:
-                    name = f.get('name')
-                    if name and name in DSL_FUNCTIONS:
-                        DSL_FUNCTIONS.pop(name, None)
-                except Exception:
-                    logger.debug(f"Failed to remove runtime entry for custom function {f}")
-            return {"message": "Custom function deleted successfully"}
-        raise HTTPException(status_code=404, detail="Custom function not found")
+    # Custom functions feature removed
+    raise HTTPException(status_code=404, detail="Custom functions feature has been removed")
 
 @api_router.put("/custom-functions/{function_id}")
 async def update_custom_function(function_id: str, func_data: CustomFunctionCreate):
     """Update an existing custom function"""
-    try:
-        # Check if function exists (DB first, then in-memory)
-        try:
-            existing = await db.custom_functions.find_one({"id": function_id})
-        except Exception:
-            existing = next((f for f in in_memory_data.get('custom_functions', []) if f.get('id') == function_id or f.get('name') == function_id), None)
-
-        if not existing:
-            raise HTTPException(status_code=404, detail="Custom function not found")
-        
-        # Update the function
-        update_data = {
-            "category": func_data.category,
-            "description": func_data.description,
-            "parameters": func_data.parameters,
-            "return_type": func_data.returnType,
-            "formula": func_data.formula,
-            "example": func_data.example,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }
-        
-        try:
-            await db.custom_functions.update_one(
-                {"id": function_id},
-                {"$set": update_data}
-            )
-            # Re-register the function in runtime
-            updated_func = CustomFunction(
-                id=function_id,
-                name=existing['name'],  # Keep original name
-                category=func_data.category,
-                description=func_data.description,
-                parameters=func_data.parameters,
-                return_type=func_data.returnType,
-                formula=func_data.formula,
-                example=func_data.example
-            )
-            await register_custom_function_runtime(updated_func)
-            return {"message": "Custom function updated successfully", "id": function_id}
-        except Exception:
-            # DB unavailable - update in-memory
-            for f in in_memory_data.get('custom_functions', []):
-                if f.get('id') == function_id or f.get('name') == function_id:
-                    f.update(update_data)
-                    break
-            # Re-register runtime from updated data
-            try:
-                updated_func = CustomFunction(
-                    id=function_id,
-                    name=existing.get('name') if isinstance(existing, dict) else existing.name,
-                    category=func_data.category,
-                    description=func_data.description,
-                    parameters=func_data.parameters,
-                    return_type=func_data.returnType,
-                    formula=func_data.formula,
-                    example=func_data.example
-                )
-                await register_custom_function_runtime(updated_func)
-            except Exception:
-                logger.debug("Failed to re-register custom function runtime after in-memory update")
-            return {"message": "Custom function updated successfully (in-memory)", "id": function_id}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error updating custom function: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+    # Custom functions feature removed
+    raise HTTPException(status_code=404, detail="Custom functions feature has been removed")
 
 async def register_custom_function_runtime(func: CustomFunction):
     """Register a custom function in the DSL runtime"""
-    # This creates a Python function dynamically from the formula
-    param_names = [p['name'] for p in func.parameters]
-    
-    # Build the function code
-    func_code = f"""
-def {func.name}({', '.join(param_names)}):
-    \"\"\" {func.description} \"\"\"
-    {func.formula}
-"""
-    
-    # Execute to create the function
-    try:
-        # Provide minimal globals including __file__ for custom functions
-        exec_globals = {
-            '__file__': os.path.abspath(__file__),
-            '__name__': '__custom_function__',
-        }
-        exec(func_code, exec_globals)
-        # Add to DSL_FUNCTIONS dict for runtime access
-        DSL_FUNCTIONS[func.name] = exec_globals[func.name]
-        logger.info(f"Registered custom function: {func.name}")
-    except Exception as e:
-        logger.error(f"Error registering custom function {func.name}: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Invalid function formula: {str(e)}")
+    # Custom functions feature removed - do not register runtime functions
+    logger.info(f"Skipping registration of custom function '{getattr(func, 'name', '<unknown>')}' because custom functions feature is disabled")
+    return
 
 # Include router under /api so frontend proxying to /api/* resolves correctly
 app.include_router(api_router, prefix="/api")
@@ -3407,34 +3234,9 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_load_custom_functions():
     """Load all custom functions into the DSL runtime on startup"""
-    try:
-        custom_funcs = await db.custom_functions.find({}, {"_id": 0}).to_list(1000)
-        for func_doc in custom_funcs:
-            try:
-                # Convert to CustomFunction model
-                custom_func = CustomFunction(
-                    id=func_doc['id'],
-                    name=func_doc['name'],
-                    category=func_doc['category'],
-                    description=func_doc['description'],
-                    parameters=func_doc['parameters'],
-                    return_type=func_doc['return_type'],
-                    formula=func_doc['formula'],
-                    example=func_doc.get('example', '')
-                )
-                await register_custom_function_runtime(custom_func)
-            except Exception as e:
-                logger.error(f"Failed to load custom function {func_doc.get('name')}: {str(e)}")
-        logger.info(f"Loaded {len(custom_funcs)} custom functions on startup")
-    except Exception as e:
-        logger.warning(f"Could not load custom functions (MongoDB may not be available): {str(e)}")
-        # When DB operations fail at startup (e.g. in test environment), force in-memory mode
-        try:
-            global USE_IN_MEMORY
-            USE_IN_MEMORY = True
-            logger.info("Switching to in-memory mode due to DB unavailability")
-        except Exception:
-            pass
+    # Custom functions feature has been disabled; skip loading and registration
+    logger.info("Custom functions feature is disabled — skipping loading and registration at startup")
+    return
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

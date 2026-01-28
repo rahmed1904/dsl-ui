@@ -9,23 +9,166 @@ const DSL_EXAMPLES = [
     title: "Compound Interest with Transaction",
     description: "Calculate compound interest and create a transaction",
     category: "Interest",
-    dslCode: `## Calculate compound interest\ninterest = compound_interest(10000, 0.05, 2)\nnew_balance = capitalization(interest, 10000)\n\n## Create the transaction\ncreateTransaction("2026-12-31", "2026-12-31", "Compound Interest", interest)`,
+    dslCode: `## Calculate compound interest
+interest = compound_interest(10000, 0.05, 2)
+new_balance = capitalization(interest, 10000)
+
+## Create the transaction
+createTransaction("2026-12-31", "2026-12-31", "Compound Interest", interest)`,
+    fields: []
   },
   {
     id: 2,
     title: "Monthly Loan Payment",
     description: "Calculate fixed monthly payment for a loan",
     category: "Loans",
-    dslCode: ` ## Calculate monthly payment\n  monthly_rate = divide(0.045, 12)\n  payment = pmt(monthly_rate, 360, 250000)\n\n  ## Create the transaction\n  createTransaction("2026-12-31", "2026-12-31", "Monthly Payment", abs(payment))`,
+    dslCode: ` ## Calculate monthly payment
+  monthly_rate = divide(0.045, 12)
+  payment = pmt(monthly_rate, 360, 250000)
+
+  ## Create the transaction
+  createTransaction("2026-12-31", "2026-12-31", "Monthly Payment", abs(payment))`,
+    fields: []
   },
   {
     id: 3,
     title: "Present Value Calculation",
     description: "Calculate present value of a future amount",
     category: "Financial",
-    dslCode: `## Calculate present value\n  discount_rate = divide(0.05, 12)\n  present_val = pv(discount_rate, 12, 0, 10000)\n\n  ## Create the transaction\n  createTransaction("2026-12-31", "2026-12-31", "Present Value", abs(present_val))`,
+    dslCode: `## Calculate present value
+  discount_rate = divide(0.05, 12)
+  present_val = pv(discount_rate, 12, 0, 10000)
+
+  ## Create the transaction
+  createTransaction("2026-12-31", "2026-12-31", "Present Value", abs(present_val))`,
+    fields: []
   },
+  {
+    id: 4,
+    title: "Straight Line Depreciation",
+    description: "Calculate annual depreciation using straight line method",
+    category: "Depreciation",
+    dslCode: `## Calculate depreciation
+  annual_depreciation = straight_line(50000, 5000, 5)
+
+  ## Create the transaction
+  createTransaction("2026-12-31", "2026-12-31", "Depreciation Expense", annual_depreciation)`,
+    fields: []
+  },
+  {
+    id: 5,
+    title: "Interest with Day Count",
+    description: "Calculate interest using ACT/360 convention",
+    category: "Interest",
+    dslCode: `## Calculate days and interest
+  days = days_between("2026-01-01", "2026-01-31")
+  interest = interest_on_balance(10000, 0.05, days)
+
+  ## Create the transaction
+  createTransaction("2026-01-31", "2026-01-31", "Accrued Interest", interest)`,
+    fields: []
+  },
+  {
+    id: 6,
+    title: "Conditional Payment Logic",
+    description: "Apply payment only if balance is positive",
+    category: "Logic",
+    dslCode: `## Calculate payment with condition
+  payment_due = pmt(0.05, 12, 1000)
+  actual_payment = iif(gt(500, 0), abs(payment_due), 0)
+
+  ## Create the transaction (only if payment > 0)
+  createTransaction("2026-01-31", "2026-01-31", "Conditional Payment", actual_payment)`,
+    fields: []
+  },
+  {
+    id: 7,
+    title: "Prorated Allocation",
+    description: "Allocate amount proportionally across partial period",
+    category: "Allocation",
+    dslCode: `## Calculate prorated amount
+  days_in_period = days_between("2026-01-01", "2026-01-15")
+  prorated_amount = prorate(12000, days_in_period, 360)
+
+  ## Create the transaction
+  createTransaction("2026-01-15", "2026-01-15", "Prorated Allocation", prorated_amount)`,
+    fields: []
+  },
+  {
+    id: 8,
+    title: "Net Present Value Analysis",
+    description: "Calculate NPV of cash flow series",
+    category: "Financial",
+    dslCode: `## Define cashflows and calculate NPV
+  cashflows = [-100000, 30000, 40000, 50000]
+  net_pv = npv(0.08, cashflows)
+
+  ## Create the transaction
+  createTransaction("2026-12-31", "2026-12-31", "NPV Analysis", net_pv)`,
+    fields: []
+  },
+  {
+    id: 9,
+    title: "Currency Conversion",
+    description: "Convert amount from one currency to another",
+    category: "Conversion",
+    dslCode: `## Convert currency
+  converted = fx_convert(1000, 1.12)
+  rounded = round(converted, 2)
+
+  ## Create the transaction
+  createTransaction("2026-06-30", "2026-06-30", "FX Conversion", rounded)`,
+    fields: []
+  },
+  {
+    id: 10,
+    title: "Clamped Rate Interest",
+    description: "Apply rate with minimum and maximum bounds",
+    category: "Logic",
+    dslCode: `## Clamp rate within bounds
+  clamped_rate = clamp(0.06, 0.03, 0.08)
+  interest = multiply(100000, clamped_rate)
+
+  ## Create the transaction
+  createTransaction("2026-12-31", "2026-12-31", "Bounded Rate Interest", interest)`,
+    fields: []
+  },
+  {
+    id: 12,
+    title: "Loan Amortization Schedule",
+    description: "Generate loan payment schedule with interest and principal",
+    category: "Schedule",
+    dslCode: `## Define loan parameters
+loan_amount = 100000
+annual_rate = 0.06
+monthly_rate = divide(annual_rate, 12)
+loan_term_months = 12
+
+## Calculate fixed monthly payment
+monthly_payment = abs(pmt(monthly_rate, loan_term_months, loan_amount))
+
+## Create schedule period
+p = period("2026-01-01", "2026-12-01", "M")
+
+## Generate amortization schedule
+sched = schedule(p, {
+    "date": "period_date",
+    "opening_bal": "lag('closing_bal', 1, loan_amount)",
+    "interest": "multiply(opening_bal, monthly_rate)",
+    "principal": "subtract(monthly_payment, interest)",
+    "closing_bal": "subtract(opening_bal, principal)"
+},{"loan_amount": loan_amount,"monthly_rate":monthly_rate,"monthly_payment":monthly_payment})
+
+## Get totals
+total_interest = schedule_sum(sched, "interest")
+
+## Execute Results
+print(sched)
+print("Total_Interest",total_interest)`,
+    fields: ["postingdate (date)", "effectivedate (date)"]
+  }
 ];
+
 
 const DSLExamples = ({ onLoadExample }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("All");

@@ -61,7 +61,7 @@ const Login = ({ onLogin }) => {
               style={{ height: 48, marginBottom: 24 }}
               data-testid="login-logo"
             />
-            <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 700, mb: 1 }}>
+            <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 700, mb: 1, color: '#14213d' }}>
               DSL Studio
             </Typography>
             <Typography variant="body2" color="text.secondary">

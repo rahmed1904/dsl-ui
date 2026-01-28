@@ -60,7 +60,7 @@ const Dashboard = ({ onSignOut }) => {
   const [tabValue, setTabValue] = useState(0);
   const [showFunctionBrowser, setShowFunctionBrowser] = useState(false);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
-  const [showCustomFunctionBuilder, setShowCustomFunctionBuilder] = useState(false);
+  // Custom function builder removed: feature disabled
   const [showEventDataViewer, setShowEventDataViewer] = useState(false);
   const chatAssistantRef = useRef(null);
   const toast = useToast();
@@ -367,7 +367,7 @@ const Dashboard = ({ onSignOut }) => {
         <div className="bg-white/80 backdrop-blur-xl border-b border-[#E9ECEF]/50 px-6 py-4 animate-fade-in-up">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#212529] tracking-tight gradient-text" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
+              <h1 className="text-2xl font-bold text-[#14213d] tracking-tight gradient-text" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
               <p className="text-sm text-[#6C757D] mt-1">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
             </div>
             <div className="flex gap-2">
@@ -391,25 +391,7 @@ const Dashboard = ({ onSignOut }) => {
               >
                 Browse Functions ({dslFunctions.length})
               </Button>
-              <Button 
-                variant="outlined" 
-                size="small" 
-                onClick={() => setShowCustomFunctionBuilder(true)}
-                data-testid="custom-function-builder-button"
-                startIcon={<Brackets className="w-4 h-4" />}
-                sx={{
-                  bgcolor: '#14213D',
-                  borderColor: '#14213D',
-                  color: '#FFFFFF',
-                  fontWeight: 500,
-                  '&:hover': {
-                    bgcolor: '#1D3557',
-                    borderColor: '#1D3557',
-                  },
-                }}
-              >
-                Build Function
-              </Button>
+              {/* Build Function removed */}
               <Button 
                 variant="outlined" 
                 size="small" 
