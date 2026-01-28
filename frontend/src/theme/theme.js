@@ -150,39 +150,70 @@ const fyntracTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          padding: '8px 16px',
+          borderRadius: 10,
+          padding: '10px 20px',
           fontSize: '0.875rem',
-          fontWeight: 500,
+          fontWeight: 600,
           boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none',
+          textTransform: 'none',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%)',
+            opacity: 0,
+            transition: 'opacity 0.2s ease',
+          },
+          '&:hover::before': {
+            opacity: 1,
+          },
+          '&:active': {
+            transform: 'scale(0.98)',
           },
         },
         sizeSmall: {
-          padding: '4px 12px',
+          padding: '6px 14px',
           fontSize: '0.8125rem',
+          borderRadius: 8,
         },
         sizeLarge: {
-          padding: '10px 20px',
+          padding: '12px 28px',
           fontSize: '0.9375rem',
+          borderRadius: 12,
         },
         contained: {
+          background: 'linear-gradient(135deg, #5B5FED 0%, #4346C8 100%)',
+          boxShadow: '0 2px 8px rgba(91, 95, 237, 0.25)',
           '&:hover': {
-            boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.12)',
+            background: 'linear-gradient(135deg, #6B6FF7 0%, #5B5FED 100%)',
+            boxShadow: '0 4px 16px rgba(91, 95, 237, 0.35)',
+            transform: 'translateY(-1px)',
           },
         },
         outlined: {
-          borderColor: '#CED4DA',
+          borderColor: '#E9ECEF',
+          borderWidth: '1.5px',
           color: '#495057',
+          background: 'rgba(255,255,255,0.8)',
+          backdropFilter: 'blur(8px)',
           '&:hover': {
-            borderColor: '#ADB5BD',
-            backgroundColor: '#F8F9FA',
+            borderColor: '#5B5FED',
+            backgroundColor: 'rgba(91, 95, 237, 0.04)',
+            color: '#5B5FED',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
           },
         },
         text: {
           '&:hover': {
-            backgroundColor: '#F8F9FA',
+            backgroundColor: 'rgba(91, 95, 237, 0.08)',
+            color: '#5B5FED',
           },
         },
       },
@@ -190,10 +221,17 @@ const fyntracTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-          border: '1px solid #E9ECEF',
-          backgroundColor: '#FFFFFF',
+          borderRadius: 16,
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04)',
+          border: '1px solid rgba(233, 236, 239, 0.8)',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 8px 32px rgba(91, 95, 237, 0.08)',
+            transform: 'translateY(-2px)',
+            borderColor: 'rgba(91, 95, 237, 0.2)',
+          },
         },
       },
     },
@@ -218,13 +256,20 @@ const fyntracTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
-            backgroundColor: '#FFFFFF',
+            borderRadius: 10,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            transition: 'all 0.2s ease',
             '& fieldset': {
-              borderColor: '#CED4DA',
+              borderColor: '#E9ECEF',
+              borderWidth: '1.5px',
+              transition: 'all 0.2s ease',
             },
             '&:hover fieldset': {
               borderColor: '#ADB5BD',
+            },
+            '&.Mui-focused': {
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 0 0 4px rgba(91, 95, 237, 0.1)',
             },
             '&.Mui-focused fieldset': {
               borderColor: '#5B5FED',
@@ -233,7 +278,7 @@ const fyntracTheme = createTheme({
           },
           '& .MuiInputBase-input': {
             fontSize: '0.875rem',
-            padding: '10px 14px',
+            padding: '12px 16px',
           },
         },
       },
@@ -246,12 +291,15 @@ const fyntracTheme = createTheme({
           fontWeight: 500,
           minHeight: 48,
           color: '#6C757D',
+          transition: 'all 0.2s ease',
+          position: 'relative',
           '&.Mui-selected': {
             color: '#5B5FED',
             fontWeight: 600,
           },
           '&:hover': {
             color: '#5B5FED',
+            backgroundColor: 'rgba(91, 95, 237, 0.04)',
           },
         },
       },
@@ -265,14 +313,31 @@ const fyntracTheme = createTheme({
           backgroundColor: '#5B5FED',
           height: 3,
           borderRadius: '3px 3px 0 0',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 12,
-          boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.12)',
+          borderRadius: 20,
+          boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.18)',
+          border: '1px solid rgba(233, 236, 239, 0.5)',
+          backdropFilter: 'blur(20px)',
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            transform: 'scale(1.1)',
+            backgroundColor: 'rgba(91, 95, 237, 0.08)',
+          },
+          '&:active': {
+            transform: 'scale(0.95)',
+          },
         },
       },
     },
@@ -304,14 +369,22 @@ const fyntracTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
+          borderRadius: 8,
           fontSize: '0.75rem',
-          fontWeight: 500,
-          height: 24,
+          fontWeight: 600,
+          height: 26,
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            transform: 'scale(1.02)',
+          },
         },
         colorSuccess: {
           backgroundColor: '#D4EDDA',
           color: '#155724',
+        },
+        colorPrimary: {
+          background: 'linear-gradient(135deg, #EEF0FE 0%, #E0E2FD 100%)',
+          color: '#5B5FED',
         },
       },
     },
@@ -372,11 +445,13 @@ const fyntracTheme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 10,
           marginBottom: 4,
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&.Mui-selected': {
             backgroundColor: '#EEF0FE',
             color: '#5B5FED',
+            boxShadow: 'inset 3px 0 0 #5B5FED',
             '&:hover': {
               backgroundColor: '#E0E2FD',
             },
@@ -386,6 +461,7 @@ const fyntracTheme = createTheme({
           },
           '&:hover': {
             backgroundColor: '#F8F9FA',
+            transform: 'translateX(4px)',
           },
         },
       },
