@@ -188,11 +188,12 @@ const fyntracTheme = createTheme({
           borderRadius: 12,
         },
         contained: {
-          background: 'linear-gradient(135deg, #5B5FED 0%, #4346C8 100%)',
-          boxShadow: '0 2px 8px rgba(91, 95, 237, 0.25)',
+          background: '#14213D',
+          color: '#FFFFFF',
+          boxShadow: '0 2px 8px rgba(20, 33, 61, 0.25)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #6B6FF7 0%, #5B5FED 100%)',
-            boxShadow: '0 4px 16px rgba(91, 95, 237, 0.35)',
+            background: '#1D3557',
+            boxShadow: '0 4px 16px rgba(20, 33, 61, 0.35)',
             transform: 'translateY(-1px)',
           },
         },
