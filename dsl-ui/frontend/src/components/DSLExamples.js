@@ -1,9 +1,7 @@
 import React from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, Button, IconButton, Box } from '@mui/material';
 import { Code, Lightbulb, Copy } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 
 const DSL_EXAMPLES = [
   {
@@ -173,6 +171,7 @@ print("Total_Interest",total_interest)`,
 
 const DSLExamples = ({ onLoadExample }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const toast = useToast();
 
   const categories = ["All", ...new Set(DSL_EXAMPLES.map(ex => ex.category))];
 
@@ -201,8 +200,8 @@ const DSLExamples = ({ onLoadExample }) => {
           {categories.map(category => (
             <Button
               key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
+              variant={selectedCategory === category ? "contained" : "outlined"}
+              size="small"
               onClick={() => setSelectedCategory(category)}
               data-testid={`example-category-${category}`}
             >
@@ -212,60 +211,69 @@ const DSLExamples = ({ onLoadExample }) => {
         </div>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-300px)]">
+      <Box sx={{ height: 'calc(100vh - 300px)', overflowY: 'auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredExamples.map((example) => (
-            <Card key={example.id} className="p-5 border-slate-200 hover:shadow-md transition-shadow duration-200" data-testid={`example-${example.id}`}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Code className="w-4 h-4 text-blue-600" />
-                    <h3 className="font-semibold text-slate-900" style={{ fontFamily: 'Manrope' }}>{example.title}</h3>
+            <Card 
+              key={example.id} 
+              sx={{ 
+                border: '1px solid #e2e8f0',
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: 3 }
+              }} 
+              data-testid={`example-${example.id}`}
+            >
+              <CardContent sx={{ p: 2.5 }}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Code className="w-4 h-4 text-blue-600" />
+                      <h3 className="font-semibold text-slate-900" style={{ fontFamily: 'Manrope' }}>{example.title}</h3>
+                    </div>
+                    <p className="text-sm text-slate-600">{example.description}</p>
+                    <div className="text-xs text-blue-600 mt-1">{example.category}</div>
                   </div>
-                  <p className="text-sm text-slate-600">{example.description}</p>
-                  <div className="text-xs text-blue-600 mt-1">{example.category}</div>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleCopyCode(example.dslCode)}
+                    data-testid={`copy-example-${example.id}`}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </IconButton>
                 </div>
+
+                <div className="mb-3">
+                  <div className="text-xs text-slate-500 mb-1">Required Fields:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {example.fields.map((field, idx) => (
+                      <span key={idx} className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded font-mono">
+                        {field}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 rounded p-3 mb-3">
+                  <pre className="text-xs text-slate-100 font-mono whitespace-pre-wrap">{example.dslCode}</pre>
+                </div>
+
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleCopyCode(example.dslCode)}
-                  className="h-8 w-8 p-0"
-                  data-testid={`copy-example-${example.id}`}
+                  variant="contained"
+                  size="small"
+                  fullWidth
+                  onClick={() => {
+                    onLoadExample(example.dslCode);
+                    toast.success(`Loaded example: ${example.title}`);
+                  }}
+                  data-testid={`load-example-${example.id}`}
                 >
-                  <Copy className="w-4 h-4" />
+                  Load into Editor
                 </Button>
-              </div>
-
-              <div className="mb-3">
-                <div className="text-xs text-slate-500 mb-1">Required Fields:</div>
-                <div className="flex flex-wrap gap-1">
-                  {example.fields.map((field, idx) => (
-                    <span key={idx} className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded font-mono">
-                      {field}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-slate-900 rounded p-3 mb-3">
-                <pre className="text-xs text-slate-100 font-mono whitespace-pre-wrap">{example.dslCode}</pre>
-              </div>
-
-              <Button
-                size="sm"
-                onClick={() => {
-                  onLoadExample(example.dslCode);
-                  toast.success(`Loaded example: ${example.title}`);
-                }}
-                className="w-full"
-                data-testid={`load-example-${example.id}`}
-              >
-                Load into Editor
-              </Button>
+              </CardContent>
             </Card>
           ))}
         </div>
-      </ScrollArea>
+      </Box>
     </div>
   );
 };
