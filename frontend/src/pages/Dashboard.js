@@ -514,7 +514,7 @@ const Dashboard = ({ onSignOut }) => {
                 <Tab 
                   icon={<BarChart3 className="w-4 h-4" />} 
                   iconPosition="start" 
-                  label="Transaction Reports" 
+                  label="Transaction Report" 
                   data-testid="reports-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />

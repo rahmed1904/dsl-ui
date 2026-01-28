@@ -43,7 +43,7 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
   return (
     <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%' }} data-testid="transaction-reports">
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h3" sx={{ mb: 0.5 }}>Transaction Reports</Typography>
+        <Typography variant="h3" sx={{ mb: 0.5 }}>Transaction Report</Typography>
         <Typography variant="body2" color="text.secondary">
           View and download generated transaction reports
         </Typography>
@@ -53,7 +53,7 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
         <Card sx={{ textAlign: 'center', py: 6 }}>
           <CardContent>
             <TrendingUp size={48} color="#CED4DA" style={{ marginBottom: 16 }} />
-            <Typography variant="h5" sx={{ mb: 1 }}>No Transaction Reports</Typography>
+            <Typography variant="h5" sx={{ mb: 1 }}>No Transaction Report</Typography>
             <Typography variant="body2" color="text.secondary">
               Execute templates to generate transaction reports
             </Typography>
