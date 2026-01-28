@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Dialog, DialogContent, DialogTitle, Card, CardContent, Button, TextField, IconButton, InputAdornment, Chip, Box, Typography } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Card, CardContent, Button, TextField, IconButton, InputAdornment, Chip, Box, Typography, Tooltip } from '@mui/material';
 import { Search, BookOpen, Copy, X, Sparkles } from "lucide-react";
 import { useToast } from "./ToastProvider";
 
@@ -156,23 +156,22 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
                         />
                       )}
                     </Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleCopyFunction(func)}
-                      data-testid={`copy-${func.name}`}
-                    >
-                      <Copy size={14} />
-                    </IconButton>
+                    <Tooltip title="Copy">
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleCopyFunction(func)}
+                          data-testid={`copy-${func.name}`}
+                        >
+                          <Copy size={14} />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
                     {func.description}
                   </Typography>
-                  {/* Small usage hint for days_to_next helper */}
-                  {func.name === 'days_to_next' && (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                      Example: days_to_next(period_date, period_start) → numeric days to next period (0 when missing)
-                    </Typography>
-                  )}
+                  
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       variant="outlined"

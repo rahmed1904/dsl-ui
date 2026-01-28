@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, Button, Box, Typography, Chip } from '@mui/material';
+import { Card, CardContent, Button, Box, Typography, Chip, Tooltip } from '@mui/material';
 import { Code, Lightbulb, Copy } from "lucide-react";
 import { useToast } from "./ToastProvider";
 
@@ -248,14 +248,18 @@ const DSLExamples = ({ onLoadExample }) => {
                     }}
                   />
                 </Box>
-                <Button
-                  size="small"
-                  onClick={() => handleCopyCode(example.dslCode)}
-                  sx={{ minWidth: 'auto', p: 1 }}
-                  data-testid={`copy-example-${example.id}`}
-                >
-                  <Copy size={16} />
-                </Button>
+                <Tooltip title="Copy">
+                  <span>
+                    <Button
+                      size="small"
+                      onClick={() => handleCopyCode(example.dslCode)}
+                      sx={{ minWidth: 'auto', p: 1 }}
+                      data-testid={`copy-example-${example.id}`}
+                    >
+                      <Copy size={16} />
+                    </Button>
+                  </span>
+                </Tooltip>
               </Box>
 
               <Box sx={{ 
