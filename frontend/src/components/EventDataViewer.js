@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
 import { X, Database, Download } from "lucide-react";
-import { Button, IconButton, Chip, Box, Typography, Table, TableHead, TableBody, TableRow, TableCell, Card } from '@mui/material';
+import { Button, IconButton, Chip, Box, Typography, Table, TableHead, TableBody, TableRow, TableCell, Card, Tabs, Tab } from '@mui/material';
 
 const API = '/api';
 
@@ -11,10 +11,40 @@ const EventDataViewer = ({ onClose }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventData, setEventData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [leftTab, setLeftTab] = useState(0); // 0 = Events, 1 = Errors
+  const [uploadErrors, setUploadErrors] = useState([]);
   const toast = useToast();
 
   useEffect(() => {
     loadEventDataSummary();
+    // load persisted upload errors
+    try {
+      const raw = localStorage.getItem('lastEventDataUploadErrors');
+      if (raw) setUploadErrors(JSON.parse(raw));
+    } catch (e) {}
+    const uploadErrorsHandler = (e) => {
+      try {
+        const detail = e?.detail || JSON.parse(localStorage.getItem('lastEventDataUploadErrors') || '[]');
+        setUploadErrors(detail || []);
+      } catch (err) {}
+    };
+
+    const clearViewerHandler = () => {
+      try {
+        setEventDataSummary([]);
+        setSelectedEvent(null);
+        setEventData(null);
+        setUploadErrors([]);
+        setLeftTab(0);
+      } catch (err) {}
+    };
+
+    window.addEventListener('dsl-upload-errors', uploadErrorsHandler);
+    window.addEventListener('dsl-clear-event-viewer', clearViewerHandler);
+    return () => {
+      window.removeEventListener('dsl-upload-errors', uploadErrorsHandler);
+      window.removeEventListener('dsl-clear-event-viewer', clearViewerHandler);
+    };
   }, []);
 
   // When summary is loaded and there's no selection, auto-select the first event
@@ -26,6 +56,10 @@ const EventDataViewer = ({ onClose }) => {
 
   const loadEventDataSummary = async () => {
     try {
+      // Clear prior viewer state before loading summary
+      setSelectedEvent(null);
+      setEventData(null);
+      setLeftTab(0);
       const response = await axios.get(`${API}/event-data`);
       setEventDataSummary(response.data);
     } catch (error) {
@@ -111,59 +145,100 @@ const EventDataViewer = ({ onClose }) => {
         <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Left Panel - Event List */}
           <Box sx={{ width: 280, borderRight: '1px solid #E9ECEF', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2, borderBottom: '1px solid #E9ECEF' }}>
-              <Typography variant="h6" sx={{ fontSize: '0.875rem' }}>Events with Data</Typography>
+            <Box sx={{ p: 0, borderBottom: '1px solid #E9ECEF' }}>
+              <Tabs value={leftTab} onChange={(e, v) => setLeftTab(v)} variant="fullWidth">
+                <Tab label={`Events (${eventDataSummary.length})`} />
+                <Tab label={`Errors (${uploadErrors.length})`} />
+              </Tabs>
             </Box>
-            
+
             <Box sx={{ flex: 1, overflowY: 'auto', p: 1.5 }}>
-              {eventDataSummary.length === 0 ? (
-                <Box sx={{ p: 2, textAlign: 'center' }}>
-                  <Database size={32} color="#CED4DA" style={{ marginBottom: 8 }} />
-                  <Typography variant="body2" color="text.secondary">No event data uploaded yet</Typography>
-                </Box>
-              ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {eventDataSummary.map((item) => (
-                    <Card
-                      key={item.event_name}
-                      sx={{
-                        p: 1.5,
-                        cursor: 'pointer',
-                        bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : 'transparent',
-                        border: '1px solid',
-                        borderColor: selectedEvent === item.event_name ? '#5B5FED' : '#E9ECEF',
-                        '&:hover': {
-                          bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : '#F8F9FA',
-                        },
-                      }}
-                      onClick={() => loadEventData(item.event_name)}
-                      data-testid={`event-data-item-${item.event_name}`}
-                    >
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: selectedEvent === item.event_name ? '#5B5FED' : '#212529' }}>
-                          {item.event_name}
-                        </Typography>
-                        <Chip
-                          label={`${item.row_count} rows`}
-                          size="small"
-                          sx={{ 
-                            fontSize: '0.6875rem',
-                            height: 20,
-                            bgcolor: selectedEvent === item.event_name ? '#5B5FED' : '#D4EDDA',
-                            color: selectedEvent === item.event_name ? '#FFFFFF' : '#155724',
-                          }}
-                        />
-                      </Box>
-                    </Card>
-                  ))}
-                </Box>
+              {leftTab === 0 && (
+                eventDataSummary.length === 0 ? (
+                  <Box sx={{ p: 2, textAlign: 'center' }}>
+                    <Database size={32} color="#CED4DA" style={{ marginBottom: 8 }} />
+                    <Typography variant="body2" color="text.secondary">No event data uploaded yet</Typography>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {eventDataSummary.map((item) => (
+                      <Card
+                        key={item.event_name}
+                        sx={{
+                          p: 1.5,
+                          cursor: 'pointer',
+                          bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : 'transparent',
+                          border: '1px solid',
+                          borderColor: selectedEvent === item.event_name ? '#5B5FED' : '#E9ECEF',
+                          '&:hover': {
+                            bgcolor: selectedEvent === item.event_name ? '#EEF0FE' : '#F8F9FA',
+                          },
+                        }}
+                        onClick={() => { setLeftTab(0); loadEventData(item.event_name); }}
+                        data-testid={`event-data-item-${item.event_name}`}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: selectedEvent === item.event_name ? '#5B5FED' : '#212529' }}>
+                            {item.event_name}
+                          </Typography>
+                          <Chip
+                            label={`${item.row_count} rows`}
+                            size="small"
+                            sx={{ 
+                              fontSize: '0.6875rem',
+                              height: 20,
+                              bgcolor: selectedEvent === item.event_name ? '#5B5FED' : '#D4EDDA',
+                              color: selectedEvent === item.event_name ? '#FFFFFF' : '#155724',
+                            }}
+                          />
+                        </Box>
+                      </Card>
+                    ))}
+                  </Box>
+                )
               )}
+
+              {/* When Errors tab is selected we intentionally do not render anything in the left panel */}
             </Box>
           </Box>
 
           {/* Right Panel - Data Table */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {!selectedEvent ? (
+            {leftTab === 1 ? (
+              // Show errors table when Errors tab selected
+              <>
+                <Box sx={{ p: 2, borderBottom: '1px solid #E9ECEF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', bgcolor: '#F8F9FA' }}>
+                  <Box>
+                    <Typography variant="h6">Upload Errors</Typography>
+                    <Typography variant="caption" color="text.secondary">{uploadErrors.length} error(s)</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+                  {uploadErrors.length > 0 ? (
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600, bgcolor: '#F8F9FA' }}>ErrorType</TableCell>
+                          <TableCell sx={{ fontWeight: 600, bgcolor: '#F8F9FA' }}>Message</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {uploadErrors.map((err, i) => (
+                          <TableRow key={i} hover>
+                            <TableCell sx={{ fontFamily: 'monospace' }}>{err.ErrorType || 'FileLoad'}</TableCell>
+                            <TableCell>{err.message}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body2" color="text.secondary">No upload errors recorded</Typography>
+                    </Box>
+                  )}
+                </Box>
+              </>
+            ) : !selectedEvent ? (
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#F8F9FA' }}>
                 <Box sx={{ textAlign: 'center' }}>
                   <Database size={64} color="#CED4DA" style={{ marginBottom: 16 }} />

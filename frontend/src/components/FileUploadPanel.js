@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
-import { Upload, FileText, FileSpreadsheet, Download, CheckCircle, Eye } from "lucide-react";
+import { Upload, FileText, FileSpreadsheet, Download, CheckCircle, Eye, X } from "lucide-react";
 import { Button, Card, CardContent, Box, Typography, LinearProgress, IconButton, Tooltip } from '@mui/material';
 
 const API = '/api';
@@ -11,17 +11,44 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
   const [excelDataFile, setExcelDataFile] = useState(null);
   const [uploadedEventFileName, setUploadedEventFileName] = useState('');
   const [uploadedExcelFileName, setUploadedExcelFileName] = useState('');
+  const [lastFailedUploadFile, setLastFailedUploadFile] = useState('');
+  const [lastUploadStatus, setLastUploadStatus] = useState(null); // 'success' | 'warning' | 'error'
 
   // Restore persisted uploaded filenames so they survive hard refresh
   useEffect(() => {
     try {
       const ev = localStorage.getItem('uploadedEventFileName');
       const ex = localStorage.getItem('uploadedExcelFileName');
+      const failed = localStorage.getItem('lastEventDataUploadFailedFile');
+      const status = localStorage.getItem('lastEventDataUploadStatus');
+      const lastUploadFile = localStorage.getItem('lastEventDataUploadFileName');
       if (ev) setUploadedEventFileName(ev);
       if (ex) setUploadedExcelFileName(ex);
+      if (failed) setLastFailedUploadFile(failed);
+      if (status) setLastUploadStatus(status);
+      if (lastUploadFile) {
+        // if previous status was success or warning, ensure uploadedExcelFileName reflects last uploaded
+        if (!ex) setUploadedExcelFileName(lastUploadFile);
+      }
     } catch (e) {
       // ignore storage errors
     }
+  }, []);
+
+  // Listen for global clear event to reset displayed/persisted filenames
+  useEffect(() => {
+    const handler = () => {
+      try {
+        setUploadedEventFileName('');
+        setUploadedExcelFileName('');
+        localStorage.removeItem('uploadedEventFileName');
+        localStorage.removeItem('uploadedExcelFileName');
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('dsl-clear-uploaded-files', handler);
+    return () => window.removeEventListener('dsl-clear-uploaded-files', handler);
   }, []);
   const [uploading, setUploading] = useState(false);
   const [eventDataSummary, setEventDataSummary] = useState([]);
@@ -45,6 +72,13 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       toast.error("Please select an event definitions file");
       return;
     }
+
+    // Clear prior event viewer data and upload errors before starting a new upload
+    try {
+      localStorage.removeItem('lastEventDataUploadErrors');
+      try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: [] })); } catch(e) {}
+      try { window.dispatchEvent(new Event('dsl-clear-event-viewer')); } catch(e) {}
+    } catch(e) {}
 
     const formData = new FormData();
     formData.append("file", eventFile);
@@ -77,6 +111,13 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       return;
     }
 
+    // Clear prior event viewer data and upload errors before starting a new upload
+    try {
+      localStorage.removeItem('lastEventDataUploadErrors');
+      try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: [] })); } catch(e) {}
+      try { window.dispatchEvent(new Event('dsl-clear-event-viewer')); } catch(e) {}
+    } catch(e) {}
+
     const formData = new FormData();
     formData.append("file", excelDataFile);
 
@@ -92,12 +133,51 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
           addConsoleLog(`✓ ${item.event_name}: ${item.rows_uploaded} rows uploaded`, "success");
         });
         toast.success(`Uploaded data for ${uploaded_events.length} event(s)`);
+        // clear last failed marker on success
+        try { localStorage.removeItem('lastEventDataUploadFailedFile'); } catch(e) {}
+        setLastFailedUploadFile('');
       }
       
       if (errors && errors.length > 0) {
-        errors.forEach(err => {
-          addConsoleLog(`⚠ ${err}`, "warning");
+        // classify each message as Warning or Error
+        const structured = errors.map(m => {
+          const msg = (m && m.message) ? String(m.message) : String(m);
+          const isWarning = /no data rows found/i.test(msg);
+          const type = isWarning ? 'Warning' : 'Error';
+          addConsoleLog(`${isWarning ? '⚠' : '✗'} ${msg}`, isWarning ? "warning" : "error");
+          return { ErrorType: type, message: msg };
         });
+        // Persist structured upload errors for viewer
+        try {
+          localStorage.setItem('lastEventDataUploadErrors', JSON.stringify(structured));
+          try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: structured })); } catch(e) {}
+        } catch(e) {}
+
+        // overall status: error if any Error, otherwise warning
+        const overall = structured.some(s => s.ErrorType === 'Error') ? 'error' : 'warning';
+        setLastUploadStatus(overall);
+        try { localStorage.setItem('lastEventDataUploadStatus', overall); } catch(e) {}
+
+        if (overall === 'error') {
+          // mark this filename as failed so viewer can highlight it
+          try {
+            if (excelDataFile && excelDataFile.name) {
+              localStorage.setItem('lastEventDataUploadFailedFile', excelDataFile.name);
+              setLastFailedUploadFile(excelDataFile.name);
+            }
+          } catch(e) {}
+        } else {
+          // warning only - clear failed marker so filename displays as green
+          try { localStorage.removeItem('lastEventDataUploadFailedFile'); } catch(e) {}
+          setLastFailedUploadFile('');
+        }
+
+        // also persist last uploaded filename for reference
+        try {
+          if (excelDataFile && excelDataFile.name) {
+            localStorage.setItem('lastEventDataUploadFileName', excelDataFile.name);
+          }
+        } catch(e) {}
       }
       
       // Persist filename for display after upload completes
@@ -108,8 +188,25 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       setExcelDataFile(null);
       onUploadSuccess();
     } catch (error) {
+      const detailMsg = error.response?.data?.detail || error.message;
       toast.error("Failed to upload Excel data");
-      addConsoleLog(`✗ Error: ${error.response?.data?.detail || error.message}`, "error");
+      addConsoleLog(`✗ Error: ${detailMsg}`, "error");
+      // mark this filename as failed so viewer can highlight it
+      try {
+        if (excelDataFile && excelDataFile.name) {
+          localStorage.setItem('lastEventDataUploadFailedFile', excelDataFile.name);
+          setLastFailedUploadFile(excelDataFile.name);
+          try { localStorage.setItem('lastEventDataUploadFileName', excelDataFile.name); } catch(e) {}
+        }
+        setLastUploadStatus('error');
+        try { localStorage.setItem('lastEventDataUploadStatus', 'error'); } catch(e) {}
+      } catch(e) {}
+      // Persist structured upload error for viewer
+      try {
+        const structured = [{ ErrorType: 'Error', message: String(detailMsg) }];
+        localStorage.setItem('lastEventDataUploadErrors', JSON.stringify(structured));
+        try { window.dispatchEvent(new CustomEvent('dsl-upload-errors', { detail: structured })); } catch(e) {}
+      } catch(e) {}
     } finally {
       setUploading(false);
     }
@@ -267,14 +364,14 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
               </label>
             </Box>
             {excelDataFile && (
-              <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                <CheckCircle size={12} />
+              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1, color: lastFailedUploadFile === excelDataFile.name ? 'error.main' : 'success.main' }}>
+                {lastFailedUploadFile === excelDataFile.name ? <X size={12} /> : <CheckCircle size={12} />}
                 {excelDataFile.name}
               </Typography>
             )}
             {uploadedExcelFileName && !excelDataFile && (
-              <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                <CheckCircle size={12} />
+              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1, color: lastFailedUploadFile === uploadedExcelFileName ? 'error.main' : 'success.main' }}>
+                {lastFailedUploadFile === uploadedExcelFileName ? <X size={12} /> : <CheckCircle size={12} />}
                 {uploadedExcelFileName}
               </Typography>
             )}
