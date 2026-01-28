@@ -11,27 +11,31 @@ The user requested a UI migration for their 'DSL Studio' application from shadcn
 
 ## What's Been Implemented
 
+## What's Been Implemented
+
 ### Completed (December 2025)
 - ✅ **MUI Migration**: Successfully replaced shadcn/ui with Material-UI dependencies
 - ✅ **Custom MUI Theme**: Created `/app/frontend/src/theme/theme.js` with Fyntrac color palette
   - Primary purple: `#5B5FED`
+  - Navy blue buttons: `#14213D` with white text
   - Light background: `#F8F9FA`
   - Consistent typography with Inter font
   - Rounded corners (10px buttons, 16px cards)
-- ✅ **Modern SaaS Styling** (Latest Update):
-  - **Navy blue buttons (#14213D)** with white text across all components
-  - Gradient buttons with hover lift effects
+- ✅ **Modern SaaS Styling**:
+  - Navy blue (#14213D) buttons with white text across all components
   - Glass-morphism on header/cards (backdrop-blur)
   - Smooth micro-animations (fadeInUp, scaleIn, float)
   - Icon button scale animations
   - Focus ring states
-  - Console dark theme with matching button styles
-- ✅ **Component Migration**: 15+ components migrated to MUI
-- ✅ **CSS Animations**: Added to `/app/frontend/src/index.css`
-  - fadeInUp, fadeInLeft, fadeInRight
-  - scaleIn, shimmer, float, pulse-soft
-  - Stagger delays for list animations
-  - hover-lift utility class
+  - Gradient text effect for titles
+- ✅ **Page Transition Animations**: Tab panels slide in with smooth reveal effects
+- ✅ **Fixed Width Layout**: 1400px minimum width with scrollbars on resize
+- ✅ **Console Dark Theme**: Matching button styles for dark console area
+- ✅ **Ask AI Button**: Added to Function Browser for each DSL function
+- ✅ **Merge to dsl-ui/main**: All UI changes merged successfully
+  - Backend code untouched (verified identical)
+  - Build passes successfully
+  - No UI regressions
 
 ## Tech Stack
 - **Frontend**: React 19, Material-UI 5.16, Tailwind CSS, Monaco Editor
