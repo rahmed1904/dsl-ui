@@ -366,10 +366,9 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
   };
 
   return (
-    <TooltipProvider>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" data-testid="custom-function-builder-modal">
-        <div className="bg-white rounded-xl shadow-2xl w-[900px] max-h-[90vh] flex flex-col">
-          {/* Header */}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" data-testid="custom-function-builder-modal">
+      <div className="bg-white rounded-xl shadow-2xl w-[900px] max-h-[90vh] flex flex-col">
+        {/* Header */}
           <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-indigo-50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
