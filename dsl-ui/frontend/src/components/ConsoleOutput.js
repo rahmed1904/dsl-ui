@@ -475,64 +475,108 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
         
         <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="outlined"
+              size="small"
               onClick={handleClearEditor}
-              className="h-7 bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600"
+              startIcon={<X className="w-3 h-3" />}
               data-testid="clear-editor-button"
+              sx={{
+                height: '28px',
+                bgcolor: '#334155',
+                color: '#cbd5e1',
+                borderColor: '#475569',
+                '&:hover': {
+                  bgcolor: '#475569',
+                },
+              }}
             >
-              <X className="w-3 h-3 mr-1 text-slate-300" />
               Clear Editor
             </Button>
 
           <Button 
-            variant="outline" 
-            size="sm" 
+            variant="outlined" 
+            size="small" 
             onClick={handleImportInputs}
             disabled={!events || events.length === 0}
-            className="h-7 bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600"
+            startIcon={<Download className="w-3 h-3" />}
             data-testid="import-inputs-button"
+            sx={{
+              height: '28px',
+              bgcolor: '#334155',
+              color: '#cbd5e1',
+              borderColor: '#475569',
+              '&:hover': {
+                bgcolor: '#475569',
+              },
+            }}
           >
-            <Download className="w-3 h-3 mr-1" />
             Import Inputs
           </Button>
           <Button 
-            variant="outline" 
-            size="sm" 
+            variant="outlined" 
+            size="small" 
             onClick={handleSaveTemplate}
-            className="h-7 bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600"
+            startIcon={<Save className="w-4 h-4" />}
             data-testid="save-template-button"
+            sx={{
+              height: '28px',
+              bgcolor: '#334155',
+              color: '#cbd5e1',
+              borderColor: '#475569',
+              '&:hover': {
+                bgcolor: '#475569',
+              },
+            }}
           >
-            <Save className="w-4 h-4 mr-1" />
             Save as Template
           </Button>
           <Button 
-            variant="outline" 
-            size="sm" 
+            variant="outlined" 
+            size="small" 
             onClick={handleBeautify}
-            className="h-7 bg-slate-700 hover:bg-slate-600 text-slate-300 border-slate-600"
+            startIcon={<Wand2 className="w-3 h-3" />}
             data-testid="beautify-code-button"
+            sx={{
+              height: '28px',
+              bgcolor: '#334155',
+              color: '#cbd5e1',
+              borderColor: '#475569',
+              '&:hover': {
+                bgcolor: '#475569',
+              },
+            }}
           >
-            <Wand2 className="w-3 h-3 mr-1" />
             Beautify
           </Button>
           <Button 
-            variant="default" 
-            size="sm" 
+            variant="contained" 
+            size="small" 
             onClick={handleRunCode}
             disabled={running}
-            className="h-7 bg-emerald-600 hover:bg-emerald-700 text-white"
+            startIcon={<Play className="w-3 h-3" />}
             data-testid="run-dsl-button"
+            sx={{
+              height: '28px',
+              bgcolor: '#059669',
+              '&:hover': {
+                bgcolor: '#047857',
+              },
+            }}
           >
-            <Play className="w-3 h-3 mr-1" />
             {running ? "Running..." : "Run"}
           </Button>
           <Button 
-            variant="ghost" 
-            size="sm" 
+            variant="text" 
+            size="small" 
             onClick={onClear}
-            className="h-7 text-slate-400 hover:text-white"
             data-testid="clear-console-button"
+            sx={{
+              height: '28px',
+              color: '#94a3b8',
+              '&:hover': {
+                color: 'white',
+              },
+            }}
           >
             <Trash2 className="w-4 h-4" />
           </Button>
