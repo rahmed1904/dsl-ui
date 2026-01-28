@@ -379,22 +379,22 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
   const contextSummary = getContextSummary();
 
   return (
-    <div className="w-[504px] bg-white border-l border-slate-200 flex flex-col h-full" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }} data-testid="chat-assistant">
-      {/* Header - Copilot style */}
-      <div className="px-4 py-3 border-b border-slate-100 bg-white">
+    <div className="w-[504px] bg-white border-l border-slate-200 flex flex-col h-full" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif" }} data-testid="chat-assistant">
+      {/* Header - Fyntrac style */}
+      <div className="px-4 py-3 border-b border-[#E9ECEF] bg-white">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-3 h-3 text-white" />
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#5B5FED] to-[#4346C8] flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-13px font-medium text-slate-900">AI Assistant</span>
+            <span className="text-sm font-semibold text-[#212529]">AI Assistant</span>
           </div>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Button 
               variant="text" 
               size="small"
               onClick={() => setShowContext(!showContext)}
-              sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', '&:hover': { bgcolor: '#F8F9FA' } }}
+              sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', borderRadius: '6px', '&:hover': { bgcolor: '#F8F9FA' } }}
             >
               {showContext ? <EyeOff size={14} /> : <Eye size={14} />}
             </Button>
@@ -403,26 +403,26 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
                 variant="text" 
                 size="small"
                 onClick={handleClearChat}
-                sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', '&:hover': { bgcolor: '#F8F9FA' } }}
+                sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', borderRadius: '6px', '&:hover': { bgcolor: '#F8F9FA' } }}
               >
                 <RefreshCw size={14} />
               </Button>
             )}
-          </div>
+          </Box>
         </div>
         
-        {/* Context Indicator */}
+        {/* Context Indicator - Fyntrac purple theme */}
         {showContext && (
-          <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-100">
-            <p className="text-xs font-medium text-blue-900 mb-2">Context</p>
-            <div className="flex flex-wrap gap-1 mb-2">
-              <Chip label={`${contextSummary.eventsCount} Events`} size="small" sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', color: '#334155', fontSize: '0.75rem' }} />
-              <Chip label={`${contextSummary.functionsCount} Functions`} size="small" sx={{ bgcolor: 'white', border: '1px solid #e2e8f0', color: '#334155', fontSize: '0.75rem' }} />
+          <div className="mt-2 p-2.5 bg-[#EEF0FE] rounded-lg border border-[#D4D6FA]">
+            <p className="text-xs font-semibold text-[#5B5FED] mb-2">Context</p>
+            <div className="flex flex-wrap gap-1.5 mb-1">
+              <Chip label={`${contextSummary.eventsCount} Events`} size="small" sx={{ bgcolor: 'white', border: '1px solid #E9ECEF', color: '#495057', fontSize: '0.75rem', fontWeight: 500 }} />
+              <Chip label={`${contextSummary.functionsCount} Functions`} size="small" sx={{ bgcolor: 'white', border: '1px solid #E9ECEF', color: '#495057', fontSize: '0.75rem', fontWeight: 500 }} />
               {contextSummary.hasEditorCode && (
-                <Chip label="Editor" size="small" sx={{ bgcolor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', fontSize: '0.75rem' }} />
+                <Chip label="Editor" size="small" sx={{ bgcolor: '#D4EDDA', border: '1px solid #C3E6CB', color: '#155724', fontSize: '0.75rem', fontWeight: 500 }} />
               )}
               {contextSummary.consoleLogsCount > 0 && (
-                <Chip label="Console" size="small" sx={{ bgcolor: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', fontSize: '0.75rem' }} />
+                <Chip label="Console" size="small" sx={{ bgcolor: '#FFF3CD', border: '1px solid #FFEEBA', color: '#856404', fontSize: '0.75rem', fontWeight: 500 }} />
               )}
             </div>
           </div>
@@ -434,47 +434,53 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
         <div className="p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mx-auto mb-3">
-                <Sparkles className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#EEF0FE] to-[#D4D6FA] flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <Sparkles className="w-6 h-6 text-[#5B5FED]" />
               </div>
-              <h3 className="text-sm font-semibold text-slate-900 mb-1">How can I help?</h3>
-              <p className="text-xs text-slate-500 max-w-[280px] mx-auto mb-5">
+              <h3 className="text-sm font-semibold text-[#212529] mb-1">How can I help?</h3>
+              <p className="text-xs text-[#6C757D] max-w-[280px] mx-auto mb-5">
                 Ask me anything about DSL, financial functions, or code generation. I can help with calculations, schedules, and transactions.
               </p>
               <div className="space-y-2.5">
                 <button 
                   onClick={() => setInput("How do I create a simple interest calculation?")}
-                  className="w-full text-left px-3 py-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-50 hover:from-blue-100 hover:to-blue-100 border border-blue-200 text-xs transition-all duration-200 group"
+                  className="w-full text-left px-3 py-3 rounded-lg bg-[#EEF0FE] hover:bg-[#E0E2FD] border border-[#D4D6FA] text-xs transition-all duration-200 group"
                 >
-                  <div className="flex items-center gap-2">
-                    <Calculator className="w-3.5 h-3.5 text-blue-600 group-hover:scale-110 transition-transform" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-md bg-[#5B5FED] flex items-center justify-center">
+                      <Calculator className="w-3.5 h-3.5 text-white" />
+                    </div>
                     <div className="text-left">
-                      <div className="font-medium text-slate-900">Calculate interest</div>
-                      <div className="text-slate-500 text-xs">Using compound interest formula</div>
+                      <div className="font-medium text-[#212529]">Calculate interest</div>
+                      <div className="text-[#6C757D] text-xs">Using compound interest formula</div>
                     </div>
                   </div>
                 </button>
                 <button 
                   onClick={() => setInput("Show me how to create a loan amortization schedule")}
-                  className="w-full text-left px-3 py-3 rounded-lg bg-gradient-to-r from-emerald-50 to-emerald-50 hover:from-emerald-100 hover:to-emerald-100 border border-emerald-200 text-xs transition-all duration-200 group"
+                  className="w-full text-left px-3 py-3 rounded-lg bg-[#D4EDDA] hover:bg-[#C3E6CB] border border-[#B8DAFF] text-xs transition-all duration-200 group"
                 >
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-md bg-[#28A745] flex items-center justify-center">
+                      <Zap className="w-3.5 h-3.5 text-white" />
+                    </div>
                     <div className="text-left">
-                      <div className="font-medium text-slate-900">Loan amortization</div>
-                      <div className="text-slate-500 text-xs">Create payment schedules</div>
+                      <div className="font-medium text-[#212529]">Loan amortization</div>
+                      <div className="text-[#6C757D] text-xs">Create payment schedules</div>
                     </div>
                   </div>
                 </button>
                 <button 
                   onClick={() => setInput("What functions are available for date calculations?")}
-                  className="w-full text-left px-3 py-3 rounded-lg bg-gradient-to-r from-violet-50 to-violet-50 hover:from-violet-100 hover:to-violet-100 border border-violet-200 text-xs transition-all duration-200 group"
+                  className="w-full text-left px-3 py-3 rounded-lg bg-[#FFF3CD] hover:bg-[#FFEEBA] border border-[#FFE8A1] text-xs transition-all duration-200 group"
                 >
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-3.5 h-3.5 text-violet-600 group-hover:scale-110 transition-transform" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-md bg-[#FFC107] flex items-center justify-center">
+                      <BookOpen className="w-3.5 h-3.5 text-white" />
+                    </div>
                     <div className="text-left">
-                      <div className="font-medium text-slate-900">Date functions</div>
-                      <div className="text-slate-500 text-xs">Work with dates and periods</div>
+                      <div className="font-medium text-[#212529]">Date functions</div>
+                      <div className="text-[#6C757D] text-xs">Work with dates and periods</div>
                     </div>
                   </div>
                 </button>
@@ -485,36 +491,36 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'assistant' && (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#5B5FED] to-[#4346C8] flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
               
               <div className={`max-w-[85%] ${msg.role === 'user' ? 'flex flex-col items-end' : ''}`}>
-                <div className={`rounded-2xl px-4 py-3 text-sm backdrop-blur-sm ${
+                <div className={`rounded-xl px-4 py-3 text-sm ${
                   msg.role === 'user' 
-                    ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-br-none shadow-md' 
-                    : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none shadow-sm hover:shadow-md transition-shadow'
+                    ? 'bg-gradient-to-br from-[#5B5FED] to-[#4346C8] text-white rounded-br-sm shadow-md' 
+                    : 'bg-white text-[#495057] border border-[#E9ECEF] rounded-bl-sm shadow-sm hover:shadow-md transition-shadow'
                 }`}>
                   <MessageContent content={msg.content} isUser={msg.role === 'user'} />
                 </div>
                 
-                {/* Action buttons - Copilot style with icons */}
+                {/* Action buttons - Fyntrac style */}
                 {msg.role === 'assistant' && hasCode(msg.content) && (
-                  <div className="flex gap-2 mt-2.5 ml-6">
+                  <div className="flex gap-1.5 mt-2 ml-6">
                     <button 
-                      className="text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium"
+                      className="text-xs text-[#6C757D] hover:text-[#5B5FED] hover:bg-[#EEF0FE] px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium border border-transparent hover:border-[#D4D6FA]"
                       onClick={() => handleCopyCode(msg.content, idx)}
                       title="Copy code"
                     >
                       {copiedIndex === idx ? (
-                        <><Check className="w-3.5 h-3.5 text-green-500" /> Copied</>
+                        <><Check className="w-3.5 h-3.5 text-[#28A745]" /> Copied</>
                       ) : (
                         <><Copy className="w-3.5 h-3.5" /> Copy</>
                       )}
                     </button>
                     <button 
-                      className="text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium"
+                      className="text-xs text-[#6C757D] hover:text-[#5B5FED] hover:bg-[#EEF0FE] px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium border border-transparent hover:border-[#D4D6FA]"
                       onClick={() => handleInsertCode(msg.content)}
                       title="Insert into editor"
                     >
@@ -522,7 +528,7 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
                     </button>
                     {onOverwriteCode && (
                       <button 
-                        className="text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium"
+                        className="text-xs text-[#6C757D] hover:text-[#5B5FED] hover:bg-[#EEF0FE] px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 font-medium border border-transparent hover:border-[#D4D6FA]"
                         onClick={() => handleOverwriteCode(msg.content)}
                         title="Replace editor content"
                       >
@@ -534,8 +540,8 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
               </div>
               
               {msg.role === 'user' && (
-                <div className="w-6 h-6 rounded-full bg-slate-300 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
-                  <User className="w-3.5 h-3.5 text-slate-700" />
+                <div className="w-6 h-6 rounded-lg bg-[#ADB5BD] flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
+                  <User className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
             </div>
@@ -543,14 +549,14 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
           
           {loading && (
             <div className="flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#5B5FED] to-[#4346C8] flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
               </div>
-              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3 rounded-bl-none shadow-sm">
+              <div className="bg-white border border-[#E9ECEF] rounded-xl px-4 py-3 rounded-bl-sm shadow-sm">
                 <div className="flex gap-1.5">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-2 h-2 bg-[#5B5FED] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-[#5B5FED] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-[#5B5FED] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             </div>
@@ -558,17 +564,17 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
         </div>
       </Box>
 
-      {/* Input - Copilot style */}
-      <div className="p-3 border-t border-slate-100 bg-white">
-        <div className="flex items-end gap-2 rounded-lg border border-slate-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-400 focus-within:ring-opacity-50 transition-all duration-200">
+      {/* Input - Fyntrac style */}
+      <div className="p-3 border-t border-[#E9ECEF] bg-white">
+        <div className="flex items-end gap-2 rounded-lg border border-[#CED4DA] bg-white focus-within:border-[#5B5FED] focus-within:ring-2 focus-within:ring-[#5B5FED] focus-within:ring-opacity-20 transition-all duration-200">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask anything..."
-            className="flex-1 bg-transparent text-sm text-slate-900 placeholder-slate-400 resize-none border-0 focus:outline-none focus:ring-0 p-3 min-h-[40px] max-h-[120px]"
-            style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+            className="flex-1 bg-transparent text-sm text-[#212529] placeholder-[#ADB5BD] resize-none border-0 focus:outline-none focus:ring-0 p-3 min-h-[40px] max-h-[120px]"
+            style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif" }}
             rows={1}
             disabled={loading}
             data-testid="chat-input"
@@ -582,15 +588,16 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
             sx={{
               m: 1,
               minWidth: 'auto',
-              height: '28px',
-              width: '28px',
+              height: '32px',
+              width: '32px',
               p: 0,
-              bgcolor: '#2563eb',
-              '&:hover': { bgcolor: '#1d4ed8' },
-              '&:disabled': { bgcolor: '#cbd5e1', color: '#64748b' }
+              borderRadius: '8px',
+              bgcolor: '#5B5FED',
+              '&:hover': { bgcolor: '#4346C8' },
+              '&:disabled': { bgcolor: '#CED4DA', color: '#6C757D' }
             }}
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="w-4 h-4" />
           </Button>
         </div>
       </div>
