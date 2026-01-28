@@ -20,7 +20,7 @@ const API = '/api';
 
 console.log('[Dashboard] Using API:', API);
 
-// TabPanel component for MUI Tabs
+// TabPanel component for MUI Tabs with animations
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div
@@ -31,7 +31,13 @@ function TabPanel({ children, value, index, ...other }) {
       style={{ height: '100%', display: value === index ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}
       {...other}
     >
-      {value === index && children}
+      {value === index && (
+        <div className="tab-panel-enter h-full flex flex-col">
+          <div className="tab-panel-content h-full flex flex-col">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
