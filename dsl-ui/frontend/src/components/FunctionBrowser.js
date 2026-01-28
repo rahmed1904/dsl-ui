@@ -1,15 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTitle, Card, CardContent, Button, TextField, IconButton, InputAdornment, Chip, Box } from '@mui/material';
 import { Search, BookOpen, Copy, X, Sparkles, Zap } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 
 const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const toast = useToast();
 
   console.log('[FunctionBrowser] Received dslFunctions:', dslFunctions.length, 'items');
 
@@ -47,7 +44,6 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
   const handleAskAI = (func) => {
     if (!onAskAI) return;
     
-    // Create a detailed prompt about the function
     const prompt = `Explain how the **${func.name}** function works with a detailed example.
 
   **Function:** ${func.name}(${func.params})
@@ -64,49 +60,61 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="function-browser">
-      <Card className="w-[90vw] h-[85vh] max-w-6xl bg-white flex flex-col">
-        {/* Header */}
-        <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-blue-600" />
-            <div>
-              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Manrope' }}>DSL Function Browser</h2>
-              <p className="text-sm text-slate-600">
-                {dslFunctions.length} functions available
-                {customCount > 0 && (
-                  <span className="ml-2 text-purple-600">
-                    ({customCount} custom)
-                  </span>
-                )}
-              </p>
-            </div>
+    <Dialog 
+      open={true} 
+      onClose={onClose} 
+      maxWidth="lg" 
+      fullWidth
+      PaperProps={{ sx: { height: '85vh', maxHeight: '85vh' } }}
+      data-testid="function-browser"
+    >
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0' }}>
+        <div className="flex items-center gap-3">
+          <BookOpen className="w-6 h-6 text-blue-600" />
+          <div>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Manrope' }}>DSL Function Browser</h2>
+            <p className="text-sm text-slate-600">
+              {dslFunctions.length} functions available
+              {customCount > 0 && (
+                <span className="ml-2 text-purple-600">
+                  ({customCount} custom)
+                </span>
+              )}
+            </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} data-testid="close-browser">
-            <X className="w-5 h-5" />
-          </Button>
         </div>
+        <IconButton onClick={onClose} data-testid="close-browser">
+          <X className="w-5 h-5" />
+        </IconButton>
+      </DialogTitle>
 
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', p: 0 }}>
         {/* Search and Filters */}
-        <div className="p-6 border-b border-slate-200 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Search functions by name, description, or parameters..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="function-search-input"
-            />
-          </div>
+        <Box sx={{ p: 3, borderBottom: '1px solid #e2e8f0' }}>
+          <TextField
+            placeholder="Search functions by name, description, or parameters..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            fullWidth
+            size="small"
+            data-testid="function-search-input"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search className="w-4 h-4 text-slate-400" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mb: 2 }}
+          />
 
           {/* Category Filters */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-2">
             {categories.map(category => (
               <Button
                 key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
+                variant={selectedCategory === category ? "contained" : "outlined"}
+                size="small"
                 onClick={() => setSelectedCategory(category)}
                 data-testid={`category-${category}`}
               >
@@ -118,69 +126,75 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
           <div className="text-sm text-slate-600">
             Showing {filteredFunctions.length} of {dslFunctions.length} functions
           </div>
-        </div>
+        </Box>
 
         {/* Function List */}
-        <ScrollArea className="flex-1 p-6">
+        <Box sx={{ flex: 1, overflowY: 'auto', p: 3 }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredFunctions.map((func, idx) => (
               <Card 
                 key={idx} 
-                className={`p-4 border-slate-200 hover:shadow-md transition-shadow duration-200 ${func.is_custom ? 'border-l-4 border-l-purple-500' : ''}`} 
+                sx={{ 
+                  border: '1px solid #e2e8f0',
+                  borderLeft: func.is_custom ? '4px solid #a855f7' : '1px solid #e2e8f0',
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: 3 }
+                }} 
                 data-testid={`function-card-${func.name}`}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="font-mono text-base font-semibold text-slate-900">
-                        {func.name}({func.params})
+                <CardContent sx={{ p: 2 }}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="font-mono text-base font-semibold text-slate-900">
+                          {func.name}({func.params})
+                        </div>
+                        {func.is_custom && (
+                          <Chip
+                            icon={<Sparkles className="w-3 h-3" />}
+                            label="Custom"
+                            size="small"
+                            sx={{ bgcolor: '#f3e8ff', color: '#7c3aed', fontSize: '0.75rem' }}
+                          />
+                        )}
                       </div>
-                      {func.is_custom && (
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-xs">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          Custom
-                        </Badge>
+                      <div className="text-xs text-blue-600 mt-1">{func.category}</div>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleCopyFunction(func)}
+                        data-testid={`copy-${func.name}`}
+                      >
+                        <Copy className="w-4 h-4" />
+                      </IconButton>
+                      {onAskAI && (
+                        <IconButton
+                          size="small"
+                          onClick={() => handleAskAI(func)}
+                          sx={{ color: '#2563eb', '&:hover': { bgcolor: '#eff6ff' } }}
+                          title="Ask AI Assistant"
+                          data-testid={`ai-${func.name}`}
+                        >
+                          <Zap className="w-4 h-4" />
+                        </IconButton>
                       )}
                     </div>
-                    <div className="text-xs text-blue-600 mt-1">{func.category}</div>
                   </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCopyFunction(func)}
-                      className="h-8 w-8 p-0"
-                      data-testid={`copy-${func.name}`}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                    {onAskAI && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleAskAI(func)}
-                        className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50"
-                        title="Ask AI Assistant"
-                        data-testid={`ai-${func.name}`}
-                      >
-                        <Zap className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm text-slate-600 mb-3">{func.description}</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    onInsertFunction(`${func.name}(${func.params})`);
-                    toast.success(`Inserted: ${func.name}()`);
-                  }}
-                  className="w-full"
-                  data-testid={`insert-${func.name}`}
-                >
-                  Insert into Editor
-                </Button>
+                  <p className="text-sm text-slate-600 mb-3">{func.description}</p>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    onClick={() => {
+                      onInsertFunction(`${func.name}(${func.params})`);
+                      toast.success(`Inserted: ${func.name}()`);
+                    }}
+                    data-testid={`insert-${func.name}`}
+                  >
+                    Insert into Editor
+                  </Button>
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -192,16 +206,16 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
               <p className="text-sm text-slate-500">Try adjusting your search or filter criteria</p>
             </div>
           )}
-        </ScrollArea>
+        </Box>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50">
-          <p className="text-xs text-slate-600 text-center">
+        <Box sx={{ p: 2, borderTop: '1px solid #e2e8f0', bgcolor: '#f8fafc', textAlign: 'center' }}>
+          <p className="text-xs text-slate-600">
             Use "Build Function" to create your own custom DSL functions
           </p>
-        </div>
-      </Card>
-    </div>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 

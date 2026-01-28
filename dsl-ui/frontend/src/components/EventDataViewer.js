@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
-import { X, Database, Table, ChevronDown, ChevronUp, Download, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { useToast } from "./ToastProvider";
+import { X, Database, Table, Download } from "lucide-react";
+import { Button, IconButton, Chip, Box } from '@mui/material';
 
 const API = '/api';
 
@@ -14,6 +11,7 @@ const EventDataViewer = ({ onClose }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventData, setEventData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     loadEventDataSummary();
@@ -81,9 +79,9 @@ const EventDataViewer = ({ onClose }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={onClose} data-testid="close-data-viewer">
+            <IconButton onClick={onClose} data-testid="close-data-viewer">
               <X className="w-5 h-5" />
-            </Button>
+            </IconButton>
           </div>
         </div>
 
@@ -94,7 +92,7 @@ const EventDataViewer = ({ onClose }) => {
               <h3 className="font-semibold text-slate-800 text-sm">Events with Data</h3>
             </div>
             
-            <ScrollArea className="flex-1">
+            <Box sx={{ flex: 1, overflowY: 'auto' }}>
               {eventDataSummary.length === 0 ? (
                 <div className="p-4 text-center text-slate-500 text-sm">
                   <Database className="w-8 h-8 mx-auto mb-2 text-slate-300" />
@@ -115,15 +113,17 @@ const EventDataViewer = ({ onClose }) => {
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-sm text-slate-800">{item.event_name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {item.row_count} rows
-                        </Badge>
+                        <Chip
+                          label={`${item.row_count} rows`}
+                          size="small"
+                          sx={{ fontSize: '0.75rem' }}
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </ScrollArea>
+            </Box>
           </div>
 
           {/* Right Panel - Data Table */}
@@ -151,12 +151,12 @@ const EventDataViewer = ({ onClose }) => {
                     </p>
                   </div>
                   <Button 
-                    variant="outline" 
-                    size="sm" 
+                    variant="outlined" 
+                    size="small" 
                     onClick={() => downloadEventData(selectedEvent)}
+                    startIcon={<Download className="w-4 h-4" />}
                     data-testid="download-event-data"
                   >
-                    <Download className="w-4 h-4 mr-1" />
                     Download CSV
                   </Button>
                 </div>
