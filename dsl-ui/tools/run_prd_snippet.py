@@ -1,5 +1,8 @@
 import sys, os, requests
-sys.path.insert(0, os.getcwd())
+# Ensure the parent directory is in PYTHONPATH for backend imports
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 from backend.server import dsl_to_python_multi_event
 
 # Fetch event definitions and data from local API
