@@ -6,10 +6,17 @@ require("dotenv").config();
 // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
 const isDevServer = process.env.NODE_ENV !== "production";
 
+// Load setupProxy for API proxying
+let setupProxy;
+if (isDevServer) {
+  setupProxy = require("./src/setupProxy");
+  console.log("[Craco] Loaded setupProxy for dev server");
+}
+
 // Environment variable overrides
 const config = {
   enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
-  enableVisualEdits: isDevServer, // Only enable during dev server
+  enableVisualEdits: false, // DISABLED - was causing React rendering issues
 };
 
 // Conditionally load visual edits modules only in dev mode
@@ -78,6 +85,44 @@ if (config.enableVisualEdits && babelMetadataPlugin) {
 }
 
 webpackConfig.devServer = (devServerConfig) => {
+  // Set up API proxy using webpack devServer proxy configuration
+  // Without pathRewrite, webpack strips /api when forwarding
+  // With pathRewrite: {'^': ''} we prevent stripping by rewriting nothing to nothing
+  devServerConfig.proxy = {
+    '/api': {
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+      logLevel: 'debug',
+      pathRewrite: {
+        '^/api': '/api'  // Rewrite /api to /api (essentially no-op, preserves /api)
+      }
+    },
+    '/ws': {
+      target: 'ws://localhost:8000',
+      ws: true,
+      changeOrigin: true,
+      logLevel: 'debug'
+    }
+  };
+
+  // Set up middleware if we have setupProxy function
+  const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+
+  devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+    // Call original setup if exists
+    if (originalSetupMiddlewares) {
+      middlewares = originalSetupMiddlewares(middlewares, devServer);
+    }
+
+    // Also call setupProxy for any additional middleware
+    if (setupProxy && typeof setupProxy === 'function') {
+      console.log("[Craco] Adding setupProxy to middlewares");
+      setupProxy(devServer.app);
+    }
+
+    return middlewares;
+  };
+
   // Apply visual edits dev server setup only if enabled
   if (config.enableVisualEdits && setupDevServer) {
     devServerConfig = setupDevServer(devServerConfig);
@@ -85,12 +130,12 @@ webpackConfig.devServer = (devServerConfig) => {
 
   // Add health check endpoints if enabled
   if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
-    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+    const healthSetupMiddlewares = devServerConfig.setupMiddlewares;
 
     devServerConfig.setupMiddlewares = (middlewares, devServer) => {
       // Call original setup if exists
-      if (originalSetupMiddlewares) {
-        middlewares = originalSetupMiddlewares(middlewares, devServer);
+      if (healthSetupMiddlewares) {
+        middlewares = healthSetupMiddlewares(middlewares, devServer);
       }
 
       // Setup health endpoints

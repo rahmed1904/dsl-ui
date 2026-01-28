@@ -1,53 +1,85 @@
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme/theme';
+import { ToastProvider, useToast } from './components/ToastProvider';
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+function AppContent() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
-    helloWorldApi();
+    console.log("App.useEffect: Loading user...");
+    const savedUser = localStorage.getItem("fyntrac_user");
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+        console.log("App.useEffect: User restored");
+      } catch (e) {
+        localStorage.removeItem("fyntrac_user");
+      }
+    } else {
+      const devUser = { email: "admin@fyntrac.com" };
+      localStorage.setItem("fyntrac_user", JSON.stringify(devUser));
+      setUser(devUser);
+      console.log("App.useEffect: Auto-login set");
+    }
+    setLoading(false);
   }, []);
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
 
-function App() {
+  const handleSignOut = () => {
+    localStorage.removeItem("fyntrac_user");
+    setUser(null);
+    toast.success("Signed out successfully");
+  };
+
+  console.log("App.render:", { loading, userEmail: user?.email });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route 
+            path="/" 
+            element={
+              user ? (
+                <Dashboard onSignOut={handleSignOut} />
+              ) : (
+                <Login onLogin={handleLogin} />
+              )
+            } 
+          />
         </Routes>
       </BrowserRouter>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 
