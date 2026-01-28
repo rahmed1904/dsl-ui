@@ -204,6 +204,7 @@ const DocumentationGuide = ({ onClose }) => (
 );
 
 const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
+  const toast = useToast();
   const [customFunctions, setCustomFunctions] = useState([]);
   const [showBuilder, setShowBuilder] = useState(false);
   const [showDocumentation, setShowDocumentation] = useState(false);
