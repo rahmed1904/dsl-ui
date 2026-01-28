@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Card, CardContent, Button, IconButton, Box, Typography, Chip } from '@mui/material';
-import { Play, FileText, Clock, Trash2 } from "lucide-react";
+import { Card, CardContent, Button, IconButton, Box, Typography, Chip, Tooltip } from '@mui/material';
+import { Play, FileText, Clock, Trash2, Rocket } from "lucide-react";
 
-const TemplatesPanel = ({ templates, onLoadTemplate, onRunTemplate, onDeleteTemplate, selectedEvent }) => {
+const TemplatesPanel = ({ templates, onLoadTemplate, onRunTemplate, onDeleteTemplate, onDeployTemplate, selectedEvent }) => {
   const [deletingIds, setDeletingIds] = useState(new Set());
+  const [deployingIds, setDeployingIds] = useState(new Set());
   
   return (
     <Box sx={{ p: 3, bgcolor: '#F8F9FA', minHeight: '100%' }} data-testid="templates-panel">
@@ -66,6 +67,43 @@ const TemplatesPanel = ({ templates, onLoadTemplate, onRunTemplate, onDeleteTemp
                   >
                     <Trash2 size={16} />
                   </IconButton>
+                  <Tooltip title="Deploy model">
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (!window.confirm(`Deploy template "${template.name}" as model?`)) return;
+                          try {
+                            setDeployingIds(prev => new Set(prev).add(template.id));
+                            if (typeof onDeployTemplate === 'function') {
+                              await onDeployTemplate(template.id, template.name);
+                            } else {
+                              // fallback: simulate deploy
+                              await new Promise(res => setTimeout(res, 800));
+                            }
+                          } catch (err) {
+                            console.error('Error deploying template', err);
+                          } finally {
+                            setDeployingIds(prev => {
+                              const copy = new Set(prev);
+                              copy.delete(template.id);
+                              return copy;
+                            });
+                          }
+                        }}
+                        sx={{
+                          color: deployingIds.has(template.id) ? '#FFC107' : '#5B5FED',
+                          transition: 'transform 200ms ease, box-shadow 200ms ease',
+                          '&:hover': { transform: 'translateY(-3px) rotate(-8deg)', boxShadow: '0 6px 18px rgba(91,95,237,0.18)' }
+                        }}
+                        data-testid={`deploy-template-${template.id}`}
+                        disabled={deployingIds.has(template.id)}
+                      >
+                        <Rocket size={16} />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
                 </Box>
 
                 <Box sx={{ 

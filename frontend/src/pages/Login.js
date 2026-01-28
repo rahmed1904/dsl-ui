@@ -25,7 +25,7 @@ const Login = ({ onLogin }) => {
 
     if (email === VALID_USER.email && password === VALID_USER.password) {
       localStorage.setItem("fyntrac_user", JSON.stringify({ email }));
-      toast.success("Welcome to DSL Studio!");
+      toast.success("Welcome to Logic Studio!");
       onLogin({ email });
     } else {
       toast.error("Invalid email or password");
@@ -62,7 +62,7 @@ const Login = ({ onLogin }) => {
               data-testid="login-logo"
             />
             <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 700, mb: 1, color: '#14213d' }}>
-              DSL Studio
+              Logic Studio
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Sign in to continue
