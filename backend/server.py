@@ -1,3 +1,4 @@
+print('DEBUG: server.py is running')
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
