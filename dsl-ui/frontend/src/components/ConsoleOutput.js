@@ -539,7 +539,7 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
         </div>
       </div>
       
-      <ScrollArea className="h-[calc(100%-48px)] p-4 max-w-full w-full overflow-hidden">
+      <Box sx={{ height: 'calc(100% - 48px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
         <div className="space-y-1 font-mono text-xs">
           {output.length === 0 ? (
             <div className="text-slate-500">Console output will appear here... Click "Run" to execute DSL code</div>
@@ -561,7 +561,7 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             ))
           )}
         </div>
-      </ScrollArea>
+      </Box>
     </div>
   );
 };
