@@ -341,7 +341,7 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
     flushCode();
 
     return (
-      <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: '13px', lineHeight: '1.6' }}>
+      <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif", fontSize: '13px', lineHeight: '1.6' }}>
         {parts.map((part, idx) => {
           if (part.type === 'code') {
             return (

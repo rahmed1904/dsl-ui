@@ -105,7 +105,7 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
                         primaryTypographyProps={{ 
                           fontSize: '0.875rem', 
                           fontWeight: isSelected ? 600 : 500,
-                          color: isSelected ? '#5B5FED' : '#495057'
+                          color: '#495057'
                         }}
                       />
                     </ListItemButton>
@@ -113,24 +113,37 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
                     <Collapse in={isExpanded} timeout="auto">
                       <Box sx={{ pl: 5, pr: 1.5, py: 1.5 }}>
                         <Box sx={{ fontSize: '0.75rem', color: '#6C757D', lineHeight: 1.6 }}>
-                          <Box sx={{ mb: 0.5 }}>
-                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• postingdate</Box>
-                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
-                          </Box>
-                          <Box sx={{ mb: 0.5 }}>
-                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• effectivedate</Box>
-                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
-                          </Box>
-                          <Box sx={{ mb: 0.5 }}>
-                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• subinstrumentid</Box>
-                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(string)</Box>
-                          </Box>
-                          {event.fields.map((field, idx) => (
-                            <Box key={idx} sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
-                              <Box component="span" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{field.name}</Box>
-                              <Box component="span" sx={{ color: '#ADB5BD' }}>({field.datatype})</Box>
-                            </Box>
-                          ))}
+                          {(() => {
+                            const evtType = (event.eventType || event.event_type || '').toString().toLowerCase();
+                            const showStandard = evtType !== 'reference';
+                            return (
+                              <>
+                                {showStandard && (
+                                  <>
+                                    <Box sx={{ mb: 0.5 }}>
+                                      <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• postingdate</Box>
+                                      <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
+                                    </Box>
+                                    <Box sx={{ mb: 0.5 }}>
+                                      <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• effectivedate</Box>
+                                      <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
+                                    </Box>
+                                    <Box sx={{ mb: 0.5 }}>
+                                      <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• subinstrumentid</Box>
+                                      <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(string)</Box>
+                                    </Box>
+                                  </>
+                                )}
+
+                                {event.fields.map((field, idx) => (
+                                  <Box key={idx} sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
+                                    <Box component="span" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{field.name}</Box>
+                                    <Box component="span" sx={{ color: '#ADB5BD' }}>({field.datatype})</Box>
+                                  </Box>
+                                ))}
+                              </>
+                            );
+                          })()}
                         </Box>
                       </Box>
                     </Collapse>

@@ -432,8 +432,8 @@ const Dashboard = ({ onSignOut }) => {
                   data-testid="menu-sample-data"
                   sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Sparkles className="w-4 h-4 text-[#5B5FED] mr-2" />
-                  Test with Sample Data
+                  <Sparkles className="w-4 h-4 text-[#6C757D] mr-2" />
+                  Sample Data
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -443,7 +443,7 @@ const Dashboard = ({ onSignOut }) => {
                   data-testid="menu-clear-data"
                   sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Trash2 className="w-4 h-4 text-[#DC3545] mr-2" />
+                  <Trash2 className="w-4 h-4 text-[#6C757D] mr-2" />
                   Clear All Data
                 </MenuItem>
                 <MenuItem
@@ -454,7 +454,7 @@ const Dashboard = ({ onSignOut }) => {
                   data-testid="menu-view-data"
                   sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Database className="w-4 h-4 text-[#17A2B8] mr-2" />
+                  <Database className="w-4 h-4 text-[#6C757D] mr-2" />
                   View Data
                 </MenuItem>
               </Menu>
