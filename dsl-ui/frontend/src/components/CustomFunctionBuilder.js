@@ -680,12 +680,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                         <div className="space-y-2">
                           {newFunction.parameters.map((param, index) => (
                             <div key={index} className="flex gap-2 items-start bg-slate-50 p-2 rounded">
-                              <Input
+                              <TextField
                                 value={param.name}
                                 onChange={(e) => handleParameterChange(index, 'name', e.target.value)}
                                 placeholder="param_name"
-                                className="flex-1 font-mono text-sm"
+                                size="small"
+                                sx={{ flex: 1 }}
                                 data-testid={`param-name-${index}`}
+                                InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
                               />
                               <Tooltip>
                                 <TooltipTrigger asChild>
