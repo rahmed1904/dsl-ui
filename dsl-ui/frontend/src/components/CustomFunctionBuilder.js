@@ -1,19 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 import { Plus, Trash2, Save, X, Code, Brackets, FileCode, Info, ChevronDown, ChevronUp, Edit2, HelpCircle, BookOpen, Lightbulb } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Button, Card, CardContent, TextField, Box, Chip, Tooltip, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 
 const API = '/api';
 
