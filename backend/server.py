@@ -1497,11 +1497,8 @@ async def download_event_definitions():
 async def upload_event_data_excel(file: UploadFile = File(...)):
     """Upload event data from Excel file - each sheet represents one event"""
     try:
-        # Clear existing event data (preserve event_definitions)
-        try:
-            await db.event_data.delete_many({})
-        except Exception:
-            logger.warning("Could not clear event_data in DB - continuing with in-memory fallback")
+        # NOTE: do NOT clear existing event data before validating the incoming file.
+        # We will only replace data for specific events after full validation passes.
         if not file.filename.endswith(('.xlsx', '.xls')):
             raise HTTPException(status_code=400, detail="File must be an Excel file (.xlsx or .xls)")
         
@@ -1544,6 +1541,16 @@ async def upload_event_data_excel(file: UploadFile = File(...)):
                 status_code=400, 
                 detail=f"Multiple posting dates found across events: {sorted(all_posting_dates)}. All events must have the same postingdate."
             )
+
+        # Enforce maximum rows per sheet: do not proceed if any sheet exceeds the limit
+        MAX_ROWS_PER_SHEET = 500
+        for sheet_name, df in sheet_data_cache.items():
+            try:
+                row_count = int(df.shape[0])
+            except Exception:
+                row_count = 0
+            if row_count > MAX_ROWS_PER_SHEET:
+                raise HTTPException(status_code=400, detail="Upload failed: This file exceeds the allowed row limit. A maximum of 500 rows per table is supported.")
         
         uploaded_events = []
         errors = []

@@ -177,6 +177,15 @@ const Dashboard = ({ onSignOut }) => {
         localStorage.removeItem('dslCode');
         localStorage.removeItem('chatMessages');
         localStorage.removeItem('chatSessionId');
+        // Remove uploaded filenames and upload state
+        localStorage.removeItem('uploadedEventFileName');
+        localStorage.removeItem('uploadedExcelFileName');
+        localStorage.removeItem('lastEventDataUploadFailedFile');
+        localStorage.removeItem('lastEventDataUploadFileName');
+        localStorage.removeItem('lastEventDataUploadStatus');
+        localStorage.removeItem('lastEventDataUploadErrors');
+        try { window.dispatchEvent(new Event('dsl-clear-uploaded-files')); } catch(e) {}
+        try { window.dispatchEvent(new Event('dsl-clear-event-viewer')); } catch(e) {}
       } catch (e) {
         // ignore
       }
