@@ -473,20 +473,20 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
           <span className="text-sm font-semibold text-slate-300" style={{ fontFamily: 'Manrope' }}>Console</span>
         </div>
         
-        <div className="flex items-center gap-2">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button
               variant="outlined"
               size="small"
               onClick={handleClearEditor}
-              startIcon={<X className="w-3 h-3" />}
+              startIcon={<X size={14} />}
               data-testid="clear-editor-button"
               sx={{
-                height: '28px',
-                bgcolor: '#334155',
-                color: '#cbd5e1',
-                borderColor: '#475569',
+                fontSize: '0.8125rem',
+                color: '#6C757D',
+                borderColor: '#CED4DA',
                 '&:hover': {
-                  bgcolor: '#475569',
+                  borderColor: '#ADB5BD',
+                  bgcolor: '#F8F9FA',
                 },
               }}
             >
@@ -498,15 +498,15 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleImportInputs}
             disabled={!events || events.length === 0}
-            startIcon={<Download className="w-3 h-3" />}
+            startIcon={<Download size={14} />}
             data-testid="import-inputs-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#6C757D',
+              borderColor: '#CED4DA',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#ADB5BD',
+                bgcolor: '#F8F9FA',
               },
             }}
           >
@@ -516,15 +516,15 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleSaveTemplate}
-            startIcon={<Save className="w-4 h-4" />}
+            startIcon={<Save size={14} />}
             data-testid="save-template-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#6C757D',
+              borderColor: '#CED4DA',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#ADB5BD',
+                bgcolor: '#F8F9FA',
               },
             }}
           >
@@ -534,15 +534,15 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             variant="outlined" 
             size="small" 
             onClick={handleBeautify}
-            startIcon={<Wand2 className="w-3 h-3" />}
+            startIcon={<Wand2 size={14} />}
             data-testid="beautify-code-button"
             sx={{
-              height: '28px',
-              bgcolor: '#334155',
-              color: '#cbd5e1',
-              borderColor: '#475569',
+              fontSize: '0.8125rem',
+              color: '#6C757D',
+              borderColor: '#CED4DA',
               '&:hover': {
-                bgcolor: '#475569',
+                borderColor: '#ADB5BD',
+                bgcolor: '#F8F9FA',
               },
             }}
           >
@@ -553,13 +553,13 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             size="small" 
             onClick={handleRunCode}
             disabled={running}
-            startIcon={<Play className="w-3 h-3" />}
+            startIcon={<Play size={14} />}
             data-testid="run-dsl-button"
             sx={{
-              height: '28px',
-              bgcolor: '#059669',
+              fontSize: '0.8125rem',
+              bgcolor: '#5B5FED',
               '&:hover': {
-                bgcolor: '#047857',
+                bgcolor: '#4346C8',
               },
             }}
           >
@@ -571,16 +571,18 @@ const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, 
             onClick={onClear}
             data-testid="clear-console-button"
             sx={{
-              height: '28px',
-              color: '#94a3b8',
+              minWidth: 'auto',
+              p: 1,
+              color: '#6C757D',
               '&:hover': {
-                color: 'white',
+                color: '#DC3545',
+                bgcolor: '#FFF5F6',
               },
             }}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 size={16} />
           </Button>
-        </div>
+        </Box>
       </div>
       
       <Box sx={{ height: 'calc(100% - 48px)', p: 2, maxWidth: '100%', width: '100%', overflow: 'auto' }}>
