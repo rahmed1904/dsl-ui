@@ -32,6 +32,31 @@ def safe_eval_expression(expression: str, context: Dict[str, Any]):
     dsl_funcs = globals().get('DSL_FUNCTIONS', {})
     safe_globals.update(dsl_funcs)
 
+    # Lazy-evaluate top-level iif(...) to avoid evaluating both branches
+    expr_str = str(expression).strip()
+    if expr_str.startswith('iif(') and expr_str.endswith(')'):
+        inside = expr_str[len('iif('):-1]
+        parts = []
+        buf = ''
+        depth = 0
+        for ch in inside:
+            if ch == ',' and depth == 0:
+                parts.append(buf.strip())
+                buf = ''
+                continue
+            buf += ch
+            if ch == '(':
+                depth += 1
+            elif ch == ')':
+                depth -= 1
+        if buf:
+            parts.append(buf.strip())
+        if len(parts) == 3:
+            cond_expr, true_expr, false_expr = parts
+            cond_val = safe_eval_expression(cond_expr, context)
+            chosen = true_expr if cond_val else false_expr
+            return safe_eval_expression(chosen, context)
+
     # Evaluate expression using eval with restricted globals and provided locals
     # The context variables are provided as locals so they shadow DSL functions if needed
     try:
@@ -438,10 +463,19 @@ def xnpv(rate: float, cashflows: List[float], dates: List[str]) -> float:
     if len(cashflows) != len(dates):
         raise ValueError("Cashflows and dates must have same length")
     
-    base_date = datetime.fromisoformat(dates[0])
+    # Normalize and validate dates
+    if not dates or len(dates) != len(cashflows):
+        raise ValueError("Cashflows and dates must have same length and not be empty")
+    nd0 = normalize_date(dates[0])
+    if not nd0:
+        return 0
+    base_date = datetime.fromisoformat(nd0)
     total = 0
     for cf, date_str in zip(cashflows, dates):
-        date = datetime.fromisoformat(date_str)
+        nd = normalize_date(date_str)
+        if not nd:
+            return 0
+        date = datetime.fromisoformat(nd)
         days = (date - base_date).days
         total += cf / ((1 + rate) ** (days / 365))  # Excel uses 365, not 365.25
     return total
@@ -697,7 +731,15 @@ def between(x: float, l: float, u: float) -> bool:
     return l <= x <= u
 
 def is_null(x: Any) -> bool:
-    return x is None
+    # Treat None, empty strings, and the literal 'None' (case-insensitive)
+    # as null values for DSL convenience.
+    if x is None:
+        return True
+    if isinstance(x, str):
+        s = x.strip()
+        if s == '' or s.lower() == 'none':
+            return True
+    return False
 
 def is_positive(x: float) -> bool:
     """Check if positive"""
@@ -772,45 +814,17 @@ def days_between(d1: Any, d2: Any) -> int:
     except Exception:
         return 0
 
-def days_to_next(d_current: Any, d_next: Any, default: int = 0) -> int:
-    """
-    Calculate signed days difference from current line item's date to next line item's date.
 
-    - Parses inputs using `normalize_date` (accepts YYYY-MM-DD strings, datetimes, etc.).
-    - Returns `(next - current).days` (can be negative if next < current).
-    - If `d_next` is None/empty/invalid, returns `default`.
-    - If either date cannot be parsed, returns `default`.
-    """
-    try:
-        n_curr = normalize_date(d_current)
-    except Exception:
-        n_curr = ''
-    try:
-        n_next = normalize_date(d_next)
-    except Exception:
-        n_next = ''
-
-    # If next date missing or invalid, return configurable default
-    if not n_next:
-        return default
-
-    if not n_curr:
-        return default
-
-    try:
-        dt_curr = datetime.fromisoformat(n_curr)
-        dt_next = datetime.fromisoformat(n_next)
-        return (dt_next - dt_curr).days
-    except Exception:
-        return default
 
 def months_between(d1: str, d2: str) -> int:
     # Handle empty or invalid date strings gracefully
     try:
-        if not d1 or not d2:
+        nd1 = normalize_date(d1)
+        nd2 = normalize_date(d2)
+        if not nd1 or not nd2:
             return 0
-        date1 = datetime.fromisoformat(d1)
-        date2 = datetime.fromisoformat(d2)
+        date1 = datetime.fromisoformat(nd1)
+        date2 = datetime.fromisoformat(nd2)
     except Exception:
         return 0
     return abs((date2.year - date1.year) * 12 + date2.month - date1.month)
@@ -820,18 +834,22 @@ def years_between(d1: str, d2: str) -> float:
 
 def add_days(d: str, n: int) -> str:
     n = _coerce_n_to_int(n, 'n')
-    date = datetime.fromisoformat(d)
+    nd = normalize_date(d)
+    if not nd:
+        return ''
+    date = datetime.fromisoformat(nd)
     new_date = date + timedelta(days=n)
     return new_date.strftime('%Y-%m-%d')
 
 def add_months(d: str, n: int) -> str:
     """Add n months to a date, handling month-end dates properly"""
     n = _coerce_n_to_int(n, 'n')
-    # Handle empty or invalid input gracefully
+    # Normalize input and handle empty/invalid gracefully
+    nd = normalize_date(d)
+    if not nd:
+        return ''
     try:
-        if not d:
-            return ''
-        date = datetime.fromisoformat(d)
+        date = datetime.fromisoformat(nd)
     except Exception:
         return ''
     month = date.month + n
@@ -852,7 +870,10 @@ def add_months(d: str, n: int) -> str:
 def add_years(d: str, n: int) -> str:
     """Add n years to a date, handling leap year dates properly"""
     n = _coerce_n_to_int(n, 'n')
-    date = datetime.fromisoformat(d)
+    nd = normalize_date(d)
+    if not nd:
+        return ''
+    date = datetime.fromisoformat(nd)
     target_year = date.year + n
     
     # Handle Feb 29 -> Feb 28 for non-leap years
@@ -878,11 +899,18 @@ def subtract_years(d: str, n: int) -> str:
     return add_years(d, -n)
 
 def start_of_month(d: str) -> str:
-    date = datetime.fromisoformat(d)
+    # Normalize input and handle empty/invalid gracefully
+    nd = normalize_date(d)
+    if not nd:
+        return ''
+    date = datetime.fromisoformat(nd)
     return f"{date.year:04d}-{date.month:02d}-01"
 
 def end_of_month(d: str) -> str:
-    date = datetime.fromisoformat(d)
+    nd = normalize_date(d)
+    if not nd:
+        return ''
+    date = datetime.fromisoformat(nd)
     if date.month == 12:
         next_month = datetime(date.year + 1, 1, 1)
     else:
@@ -898,8 +926,12 @@ def day_count_fraction(d1: str, d2: str, conv: str = "ACT/360") -> float:
     elif conv == "ACT/365":
         return days / 365
     elif conv == "30/360":
-        date1 = datetime.fromisoformat(d1)
-        date2 = datetime.fromisoformat(d2)
+        nd1 = normalize_date(d1)
+        nd2 = normalize_date(d2)
+        if not nd1 or not nd2:
+            return 0
+        date1 = datetime.fromisoformat(nd1)
+        date2 = datetime.fromisoformat(nd2)
         return ((date2.year - date1.year) * 360 + (date2.month - date1.month) * 30 + (date2.day - date1.day)) / 360
     return days / 365.25
 
@@ -913,13 +945,25 @@ def days_in_year(year: int) -> int:
 
 def quarter(d: str) -> int:
     """Get quarter from date"""
-    date = datetime.fromisoformat(d)
-    return (date.month - 1) // 3 + 1
+    nd = normalize_date(d)
+    if not nd:
+        return 0
+    try:
+        date = datetime.fromisoformat(nd)
+        return (date.month - 1) // 3 + 1
+    except Exception:
+        return 0
 
 def day_of_week(d: str) -> int:
     """Day of week (0=Monday, 6=Sunday)"""
-    date = datetime.fromisoformat(d)
-    return date.weekday()
+    nd = normalize_date(d)
+    if not nd:
+        return 0
+    try:
+        date = datetime.fromisoformat(nd)
+        return date.weekday()
+    except Exception:
+        return 0
 
 def is_weekend(d: str) -> bool:
     """Check if weekend"""
@@ -927,8 +971,13 @@ def is_weekend(d: str) -> bool:
 
 def business_days(d1: str, d2: str) -> int:
     """Count business days"""
-    date1 = datetime.fromisoformat(d1)
-    date2 = datetime.fromisoformat(d2)
+    # Normalize inputs and handle empty/invalid values
+    nd1 = normalize_date(d1)
+    nd2 = normalize_date(d2)
+    if not nd1 or not nd2:
+        return 0
+    date1 = datetime.fromisoformat(nd1)
+    date2 = datetime.fromisoformat(nd2)
     days = abs((date2 - date1).days)
     weeks = days // 7
     remaining = days % 7
@@ -975,9 +1024,21 @@ def period(start: str, end: str, freq: str = "M", convention: str = "ACT/360") -
             "convention": convention,
             "dates": []
         }
+    # Normalize start/end and guard invalid values
+    nd_start = normalize_date(start)
+    nd_end = normalize_date(end)
+    if not nd_start or not nd_end:
+        return {
+            "type": "period",
+            "start": start,
+            "end": end,
+            "freq": freq,
+            "convention": convention,
+            "dates": []
+        }
     try:
-        start_date = datetime.fromisoformat(start)
-        end_date = datetime.fromisoformat(end)
+        start_date = datetime.fromisoformat(nd_start)
+        end_date = datetime.fromisoformat(nd_end)
     except Exception:
         return {
             "type": "period",
@@ -2025,14 +2086,21 @@ def find_period_amounts(
         if sched:
             # Inline period-match logic (previously schedule_find_period)
             try:
-                target = datetime.fromisoformat(str(posting_date))
+                nd_post = normalize_date(posting_date)
+                if not nd_post:
+                    matched_row = {}
+                    raise ValueError("invalid posting_date")
+                target = datetime.fromisoformat(str(nd_post))
                 target_year_month = (target.year, target.month)
                 matched_row = {}
                 for row in sched:
                     period_date_str = row.get("period_date")
                     if period_date_str:
                         try:
-                            period_date = datetime.fromisoformat(str(period_date_str))
+                            nd_pd = normalize_date(period_date_str)
+                            if not nd_pd:
+                                continue
+                            period_date = datetime.fromisoformat(str(nd_pd))
                         except Exception:
                             continue
                         if (period_date.year, period_date.month) == target_year_month:
@@ -3049,7 +3117,6 @@ DSL_FUNCTIONS = {
     # Date
     'normalize_date': normalize_date,
     'days_between': days_between, 'months_between': months_between, 'years_between': years_between,
-    'days_to_next': days_to_next,
     'add_days': add_days, 'add_months': add_months, 'add_years': add_years,
     'subtract_days': subtract_days, 'subtract_months': subtract_months, 'subtract_years': subtract_years,
     'start_of_month': start_of_month, 'end_of_month': end_of_month,
@@ -3187,7 +3254,6 @@ DSL_FUNCTION_METADATA = [
     # Date (19)
     # (Removed duplicate normalize_date entry)
     {"name": "days_between", "params": "d1, d2", "description": "Days between dates", "category": "Date"},
-    {"name": "days_to_next", "params": "current_date, next_date, default=0", "description": "Signed days from current row date to next row date; returns default when next is missing", "category": "Date"},
     {"name": "months_between", "params": "d1, d2", "description": "Months between", "category": "Date"},
     {"name": "years_between", "params": "d1, d2", "description": "Years between", "category": "Date"},
     {"name": "add_days", "params": "d, n", "description": "Add days to date", "category": "Date"},
