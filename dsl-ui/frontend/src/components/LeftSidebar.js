@@ -1,14 +1,13 @@
 import React from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Box, Button, Card, CardContent, Collapse } from '@mui/material';
 import { FileText, Code2, RefreshCw, LogOut, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 
 const FYNTRAC_LOGO = "/logo.png";
 
 const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, onSignOut }) => {
   const [expandedEvent, setExpandedEvent] = React.useState(null);
+  const toast = useToast();
 
   const toggleExpand = (eventName) => {
     setExpandedEvent(prev => (prev === eventName ? null : eventName));
@@ -26,7 +25,7 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
         />
       </div>
 
-      <ScrollArea className="flex-1">
+      <Box sx={{ flex: 1, overflowY: 'auto' }}>
         <div className="p-6 space-y-6">
           {/* Event Configuration Section */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -35,11 +34,22 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
               Event Configuration
             </h3>
             <Button
-              variant="solid"
-              size="sm"
-              onClick={() => toast('Coming soon')}
-              className="w-full py-2 text-sm rounded-md bg-blue-100 text-slate-600 border border-transparent shadow-sm hover:bg-blue-200"
+              variant="contained"
+              size="small"
+              onClick={() => toast.info('Coming soon')}
+              fullWidth
               data-testid="import-events-button"
+              sx={{
+                py: 1,
+                fontSize: '0.875rem',
+                bgcolor: '#dbeafe',
+                color: '#475569',
+                boxShadow: 'none',
+                '&:hover': {
+                  bgcolor: '#bfdbfe',
+                  boxShadow: 'none',
+                },
+              }}
             >
               Import
             </Button>
@@ -60,7 +70,13 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
                   return (
                     <Card 
                       key={event.id}
-                      className={`p-0 overflow-hidden transition-colors duration-200 ${selectedEvent === event.event_name ? 'border-blue-600 bg-blue-50' : 'border-slate-200'}`}
+                      sx={{
+                        p: 0,
+                        borderRadius: 2,
+                        border: selectedEvent === event.event_name ? '1px solid #2563eb' : '1px solid #e2e8f0',
+                        bgcolor: selectedEvent === event.event_name ? '#eff6ff' : 'white',
+                        transition: 'all 0.2s',
+                      }}
                       data-testid={`event-${event.event_name}`}
                     >
                       <button
@@ -72,28 +88,30 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
                         <ChevronDown className={`w-4 h-4 text-slate-500 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                       </button>
 
-                      <div className={`px-3 transition-[max-height] duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-96 py-3' : 'max-h-0'}`}>
-                        <div className="space-y-1">
-                          <div className="text-xs text-slate-600 break-all">
-                            <span className="font-mono text-[11px] text-blue-600">• postingdate</span>
-                            <span className="ml-1 text-slate-400">(date)</span>
-                          </div>
-                          <div className="text-xs text-slate-600 break-all">
-                            <span className="font-mono text-[11px] text-blue-600">• effectivedate</span>
-                            <span className="ml-1 text-slate-400">(date)</span>
-                          </div>
-                          <div className="text-xs text-slate-600 break-all">
-                            <span className="font-mono text-[11px] text-blue-600">• subinstrumentid</span>
-                            <span className="ml-1 text-slate-400">(string)</span>
-                          </div>
-                          {event.fields.map((field, idx) => (
-                            <div key={idx} className="text-xs text-slate-600 break-all flex justify-between">
-                              <span className="font-mono text-[11px]">{field.name}</span>
-                              <span className="ml-1 text-slate-400">{`(${field.datatype})`}</span>
+                      <Collapse in={isExpanded} timeout="auto">
+                        <div className="px-3 py-3">
+                          <div className="space-y-1">
+                            <div className="text-xs text-slate-600 break-all">
+                              <span className="font-mono text-[11px] text-blue-600">• postingdate</span>
+                              <span className="ml-1 text-slate-400">(date)</span>
                             </div>
-                          ))}
+                            <div className="text-xs text-slate-600 break-all">
+                              <span className="font-mono text-[11px] text-blue-600">• effectivedate</span>
+                              <span className="ml-1 text-slate-400">(date)</span>
+                            </div>
+                            <div className="text-xs text-slate-600 break-all">
+                              <span className="font-mono text-[11px] text-blue-600">• subinstrumentid</span>
+                              <span className="ml-1 text-slate-400">(string)</span>
+                            </div>
+                            {event.fields.map((field, idx) => (
+                              <div key={idx} className="text-xs text-slate-600 break-all flex justify-between">
+                                <span className="font-mono text-[11px]">{field.name}</span>
+                                <span className="ml-1 text-slate-400">{`(${field.datatype})`}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      </Collapse>
                     </Card>
                   );
                 })}
@@ -101,18 +119,28 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
             )}
           </div>
         </div>
-      </ScrollArea>
+      </Box>
 
       {/* Sign Out Button at Bottom */}
       <div className="p-4 border-t border-slate-200">
         <Button 
-          variant="outline" 
-          size="sm" 
+          variant="outlined" 
+          size="small" 
           onClick={onSignOut}
-          className="w-full justify-start text-slate-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50"
+          fullWidth
+          startIcon={<LogOut className="w-4 h-4" />}
           data-testid="signout-button"
+          sx={{
+            justifyContent: 'flex-start',
+            color: '#475569',
+            borderColor: '#e2e8f0',
+            '&:hover': {
+              color: '#dc2626',
+              borderColor: '#fecaca',
+              bgcolor: '#fef2f2',
+            },
+          }}
         >
-          <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
       </div>
