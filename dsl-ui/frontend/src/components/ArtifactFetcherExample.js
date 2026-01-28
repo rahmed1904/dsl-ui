@@ -1,31 +1,41 @@
-import React from 'react'
+import React from 'react';
+import { Box, Alert } from '@mui/material';
 
 export default function ArtifactFetcherExample({ templateId }) {
-  const [code, setCode] = React.useState(null)
-  const [error, setError] = React.useState(null)
+  const [code, setCode] = React.useState(null);
+  const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
-    if (!templateId) return
+    if (!templateId) return;
     const fetchArtifact = async () => {
       try {
-        const res = await fetch(`/api/templates/${templateId}/artifact`)
-        if (!res.ok) throw new Error(await res.text())
-        const json = await res.json()
-        setCode(json.python_code)
+        const res = await fetch(`/api/templates/${templateId}/artifact`);
+        if (!res.ok) throw new Error(await res.text());
+        const json = await res.json();
+        setCode(json.python_code);
       } catch (e) {
-        setError(String(e))
+        setError(String(e));
       }
-    }
-    fetchArtifact()
-  }, [templateId])
+    };
+    fetchArtifact();
+  }, [templateId]);
 
-  if (error) return <div className="p-4 bg-red-50 text-red-800">Error: {error}</div>
-  if (!code) return <div className="p-4">Loading artifact...</div>
+  if (error) return (
+    <Alert severity="error" sx={{ m: 2 }}>
+      Error: {error}
+    </Alert>
+  );
+  
+  if (!code) return (
+    <Box sx={{ p: 2 }}>
+      Loading artifact...
+    </Box>
+  );
 
   return (
-    <div className="p-4 bg-gray-50">
+    <Box sx={{ p: 2, bgcolor: '#f8fafc' }}>
       <h3 className="font-semibold mb-2">Artifact: {templateId}</h3>
       <pre className="whitespace-pre-wrap text-sm">{code}</pre>
-    </div>
-  )
+    </Box>
+  );
 }
