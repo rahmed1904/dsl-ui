@@ -12,7 +12,7 @@ import TemplatesPanel from "../components/TemplatesPanel";
 import TransactionReports from "../components/TransactionReports";
 import FunctionBrowser from "../components/FunctionBrowser";
 import DSLExamples from "../components/DSLExamples";
-import CustomFunctionBuilder from "../components/CustomFunctionBuilder";
+// import CustomFunctionBuilder from "../components/CustomFunctionBuilder";
 import EventDataViewer from "../components/EventDataViewer";
 
 // API URL - use relative path since setupProxy.js handles the forwarding
@@ -20,7 +20,7 @@ const API = '/api';
 
 console.log('[Dashboard] Using API:', API);
 
-// TabPanel component for MUI Tabs
+// TabPanel component for MUI Tabs with animations
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div
@@ -31,7 +31,13 @@ function TabPanel({ children, value, index, ...other }) {
       style={{ height: '100%', display: value === index ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}
       {...other}
     >
-      {value === index && children}
+      {value === index && (
+        <div className="tab-panel-enter h-full flex flex-col">
+          <div className="tab-panel-content h-full flex flex-col">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -42,15 +48,15 @@ const Dashboard = ({ onSignOut }) => {
   const [dslCode, setDslCode] = useState(() => {
     try {
       const saved = localStorage.getItem('dslCode');
-      return saved || \"## Welcome to Fyntac DSL Code Editor ##\";
+      return saved || "## Welcome to Fyntac DSL Code Editor ##";
     } catch (e) {
-      return \"## Welcome to Fyntac DSL Code Editor ##\";
+      return "## Welcome to Fyntac DSL Code Editor ##";
     }
   });
   const [consoleOutput, setConsoleOutput] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [transactionReports, setTransactionReports] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(\"\");
+  const [selectedEvent, setSelectedEvent] = useState("");
   const [tabValue, setTabValue] = useState(0);
   const [showFunctionBrowser, setShowFunctionBrowser] = useState(false);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
@@ -88,7 +94,7 @@ const Dashboard = ({ onSignOut }) => {
         setSelectedEvent(response.data[0].event_name);
       }
     } catch (error) {
-      console.error(\"Error loading events:\", error);
+      console.error("Error loading events:", error);
     }
   };
 
@@ -99,7 +105,7 @@ const Dashboard = ({ onSignOut }) => {
       console.log('[loadDslFunctions] Received', response.data.length, 'functions');
       setDslFunctions(response.data);
     } catch (error) {
-      console.error(\"Error loading DSL functions:\", error);
+      console.error("Error loading DSL functions:", error);
     }
   };
 
@@ -108,7 +114,7 @@ const Dashboard = ({ onSignOut }) => {
       const response = await axios.get(`${API}/templates`);
       setTemplates(response.data);
     } catch (error) {
-      console.error(\"Error loading templates:\", error);
+      console.error("Error loading templates:", error);
     }
   };
 
@@ -117,22 +123,22 @@ const Dashboard = ({ onSignOut }) => {
       const response = await axios.get(`${API}/transaction-reports`);
       setTransactionReports(response.data);
     } catch (error) {
-      console.error(\"Error loading transaction reports:\", error);
+      console.error("Error loading transaction reports:", error);
     }
   };
 
-  const addConsoleLog = (message, type = \"info\") => {
+  const addConsoleLog = (message, type = "info") => {
     const timestamp = new Date().toLocaleTimeString();
     setConsoleOutput(prev => [...prev, { timestamp, message, type }]);
   };
 
   const handleLoadSampleData = async () => {
     try {
-      addConsoleLog(\"Loading sample data...\", \"info\");
+      addConsoleLog("Loading sample data...", "info");
       const response = await axios.post(`${API}/load-sample-data`);
       
-      addConsoleLog(`✓ Sample data loaded successfully!`, \"success\");
-      addConsoleLog(`Events: ${response.data.events.join(\", \")}`, \"info\");
+      addConsoleLog(`✓ Sample data loaded successfully!`, "success");
+      addConsoleLog(`Events: ${response.data.events.join(", ")}`, "info");
       
       if (response.data.sample_dsl_code) {
         setDslCode(response.data.sample_dsl_code);
@@ -141,28 +147,28 @@ const Dashboard = ({ onSignOut }) => {
       await loadEvents();
       await loadDslFunctions();
       
-      toast.success(\"Sample data loaded! Ready to test.\");
+      toast.success("Sample data loaded! Ready to test.");
     } catch (error) {
-      addConsoleLog(`✗ Error loading sample data: ${error.message}`, \"error\");
-      toast.error(\"Failed to load sample data\");
+      addConsoleLog(`✗ Error loading sample data: ${error.message}`, "error");
+      toast.error("Failed to load sample data");
     }
   };
 
   const handleClearAllData = async () => {
-    const confirmed = window.confirm(\"Are you sure you want to clear all data? This will delete all events, DSL functions, event data, and templates. This action cannot be undone.\");
+    const confirmed = window.confirm("Are you sure you want to clear all data? This will delete all events, DSL functions, event data, and templates. This action cannot be undone.");
     if (!confirmed) return;
 
     try {
-      addConsoleLog(\"Clearing all data...\", \"info\");
+      addConsoleLog("Clearing all data...", "info");
       const response = await axios.delete(`${API}/clear-all-data`);
       
-      addConsoleLog(`✓ ${response.data.message}`, \"success\");
+      addConsoleLog(`✓ ${response.data.message}`, "success");
       
       setEvents([]);
       setDslFunctions([]);
       setTemplates([]);
       setTransactionReports([]);
-      setSelectedEvent(\"\");
+      setSelectedEvent("");
       setDslCode('');
 
       try {
@@ -177,10 +183,10 @@ const Dashboard = ({ onSignOut }) => {
       await loadTemplates();
       await loadTransactionReports();
 
-      toast.success(\"All data cleared! Fresh environment ready.\");
+      toast.success("All data cleared! Fresh environment ready.");
     } catch (error) {
-      addConsoleLog(`✗ Error clearing data: ${error.message}`, \"error\");
-      toast.error(\"Failed to clear data\");
+      addConsoleLog(`✗ Error clearing data: ${error.message}`, "error");
+      toast.error("Failed to clear data");
     }
   };
 
@@ -196,19 +202,19 @@ const Dashboard = ({ onSignOut }) => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success(\"Event definitions downloaded!\");
+      toast.success("Event definitions downloaded!");
     } catch (error) {
-      toast.error(\"Failed to download events\");
+      toast.error("Failed to download events");
     }
   };
 
   const handleSaveTemplate = async () => {
     if (!selectedEvent) {
-      toast.error(\"Please select an event first\");
+      toast.error("Please select an event first");
       return;
     }
     
-    const templateName = prompt(\"Enter template name:\");
+    const templateName = prompt("Enter template name:");
     if (!templateName) return;
 
     try {
@@ -216,14 +222,14 @@ const Dashboard = ({ onSignOut }) => {
       
       let shouldReplace = false;
       if (checkResponse.data.exists) {
-        shouldReplace = window.confirm(`A template named \"${templateName}\" already exists. Do you want to replace it?`);
+        shouldReplace = window.confirm(`A template named "${templateName}" already exists. Do you want to replace it?`);
         if (!shouldReplace) {
-          toast.info(\"Template save cancelled\");
+          toast.info("Template save cancelled");
           return;
         }
       }
 
-      addConsoleLog(`Saving template '${templateName}'${shouldReplace ? ' (replacing existing)' : ''}...`, \"info\");
+      addConsoleLog(`Saving template '${templateName}'${shouldReplace ? ' (replacing existing)' : ''}...`, "info");
       const response = await axios.post(
         `${API}/templates`,
         {
@@ -233,38 +239,38 @@ const Dashboard = ({ onSignOut }) => {
           replace: shouldReplace
         }
       );
-      addConsoleLog(`✓ Template ${shouldReplace ? 'replaced' : 'saved'} successfully!`, \"success\");
-      toast.success(shouldReplace ? \"Template replaced!\" : \"Template saved!\");
+      addConsoleLog(`✓ Template ${shouldReplace ? 'replaced' : 'saved'} successfully!`, "success");
+      toast.success(shouldReplace ? "Template replaced!" : "Template saved!");
       loadTemplates();
     } catch (error) {
       const errorMsg = error.response?.data?.detail || error.message;
-      addConsoleLog(`✗ Error saving template: ${errorMsg}`, \"error\");
-      toast.error(\"Failed to save template\");
+      addConsoleLog(`✗ Error saving template: ${errorMsg}`, "error");
+      toast.error("Failed to save template");
     }
   };
 
   const handleRunTemplate = async (templateId) => {
     if (!selectedEvent) {
-      toast.error(\"Please select an event first\");
+      toast.error("Please select an event first");
       return;
     }
 
     try {
-      addConsoleLog(\"Executing template on event data...\", \"info\");
+      addConsoleLog("Executing template on event data...", "info");
       const response = await axios.post(`${API}/templates/execute`, {
         template_id: templateId,
         event_name: selectedEvent
       });
       
-      addConsoleLog(`✓ Execution completed! Generated ${response.data.transactions.length} transactions`, \"success\");
-      addConsoleLog(`Report ID: ${response.data.report_id}`, \"info\");
-      addConsoleLog(JSON.stringify(response.data.transactions, null, 2), \"result\");
+      addConsoleLog(`✓ Execution completed! Generated ${response.data.transactions.length} transactions`, "success");
+      addConsoleLog(`Report ID: ${response.data.report_id}`, "info");
+      addConsoleLog(JSON.stringify(response.data.transactions, null, 2), "result");
       toast.success(`Generated ${response.data.transactions.length} transactions`);
       
       loadTransactionReports();
     } catch (error) {
-      addConsoleLog(`✗ Execution error: ${error.response?.data?.detail || error.message}`, \"error\");
-      toast.error(\"Execution failed\");
+      addConsoleLog(`✗ Execution error: ${error.response?.data?.detail || error.message}`, "error");
+      toast.error("Execution failed");
     }
   };
 
@@ -281,40 +287,40 @@ const Dashboard = ({ onSignOut }) => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success(\"Transaction report downloaded!\");
+      toast.success("Transaction report downloaded!");
     } catch (error) {
-      toast.error(\"Failed to download report\");
+      toast.error("Failed to download report");
     }
   };
 
   const handleDeleteReport = async (reportId, reportName) => {
-    const confirmed = window.confirm(`Are you sure you want to delete report \"${reportName}\"?`);
+    const confirmed = window.confirm(`Are you sure you want to delete report "${reportName}"?`);
     if (!confirmed) return;
 
     try {
-      addConsoleLog(`Deleting report '${reportName}'...`, \"info\");
+      addConsoleLog(`Deleting report '${reportName}'...`, "info");
       await axios.delete(`${API}/transaction-reports/${reportId}`);
       
-      addConsoleLog(`✓ Report deleted successfully!`, \"success\");
-      toast.success(\"Report deleted!\");
+      addConsoleLog(`✓ Report deleted successfully!`, "success");
+      toast.success("Report deleted!");
       loadTransactionReports();
     } catch (error) {
-      addConsoleLog(`✗ Error deleting report: ${error.message}`, \"error\");
-      toast.error(\"Failed to delete report\");
+      addConsoleLog(`✗ Error deleting report: ${error.message}`, "error");
+      toast.error("Failed to delete report");
     }
   };
 
   const handleDeleteTemplate = async (templateId, templateName) => {
     try {
-      addConsoleLog(`Deleting template '${templateName}'...`, \"info\");
+      addConsoleLog(`Deleting template '${templateName}'...`, "info");
       await axios.delete(`${API}/templates/${templateId}`);
       
-      addConsoleLog(`✓ Template deleted successfully!`, \"success\");
-      toast.success(\"Template deleted!\");
+      addConsoleLog(`✓ Template deleted successfully!`, "success");
+      toast.success("Template deleted!");
       loadTemplates();
     } catch (error) {
       const errorMsg = error.response?.data?.detail || error.message;
-      addConsoleLog(`✗ Error deleting template: ${errorMsg}`, \"error\");
+      addConsoleLog(`✗ Error deleting template: ${errorMsg}`, "error");
       toast.error(`Failed to delete template: ${errorMsg}`);
       throw error;
     }
@@ -322,17 +328,17 @@ const Dashboard = ({ onSignOut }) => {
 
   const handleLoadTemplate = (template) => {
     setDslCode(template.dsl_code);
-    addConsoleLog(`Loaded template: ${template.name}`, \"info\");
+    addConsoleLog(`Loaded template: ${template.name}`, "info");
     toast.success(`Loaded template: ${template.name}`);
   };
 
   const handleLoadExample = (exampleCode) => {
     setDslCode(exampleCode);
-    addConsoleLog(\"Loaded DSL example\", \"info\");
+    addConsoleLog("Loaded DSL example", "info");
   };
 
   const handleInsertFunction = (functionCall) => {
-    setDslCode(prev => prev + \"\\n\" + functionCall);
+    setDslCode(prev => prev + "\\n" + functionCall);
   };
 
   const handleAskAIAboutFunction = (message) => {
@@ -342,66 +348,83 @@ const Dashboard = ({ onSignOut }) => {
   };
 
   return (
-    <div className=\"flex h-screen bg-slate-50 overflow-x-hidden\" data-testid=\"dashboard-container\">
+    <div className="flex h-screen bg-[#F8F9FA] overflow-auto" style={{ minWidth: '1400px' }} data-testid="dashboard-container">
       {/* Left Sidebar */}
-      <LeftSidebar 
-        events={events} 
-        selectedEvent={selectedEvent}
-        onEventSelect={setSelectedEvent}
-        onDownloadEvents={handleDownloadEvents}
-        onSignOut={onSignOut}
-      />
+      <div className="sidebar-enter">
+        <LeftSidebar 
+          events={events} 
+          selectedEvent={selectedEvent}
+          onEventSelect={setSelectedEvent}
+          onDownloadEvents={handleDownloadEvents}
+          onSignOut={onSignOut}
+        />
+      </div>
 
       {/* Main Content */}
-      <div className=\"flex-1 flex flex-col min-w-0\">
-        {/* Top Bar */}
-        <div className=\"bg-white border-b border-slate-200 px-6 py-4\">
-          <div className=\"flex items-center justify-between\">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Bar - Fyntrac style */}
+        <div className="bg-white/80 backdrop-blur-xl border-b border-[#E9ECEF]/50 px-6 py-4 animate-fade-in-up">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className=\"text-2xl font-bold text-slate-900 tracking-tight\" style={{ fontFamily: 'Manrope' }}>DSL Studio</h1>
-              <p className=\"text-sm text-slate-600 mt-1\">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
+              <h1 className="text-2xl font-bold text-[#212529] tracking-tight gradient-text" style={{ fontFamily: "'Inter', sans-serif" }}>DSL Studio</h1>
+              <p className="text-sm text-[#6C757D] mt-1">Design calculation logic using a Domain-Specific Language (DSL) that is intuitive for finance professionals</p>
             </div>
-            <div className=\"flex gap-2\">
+            <div className="flex gap-2">
               <Button 
-                variant=\"outlined\" 
-                size=\"small\" 
+                variant="outlined" 
+                size="small" 
                 onClick={() => setShowFunctionBrowser(true)}
-                data-testid=\"browse-functions-button\"
+                data-testid="browse-functions-button"
                 title={`${dslFunctions.length} functions loaded`}
-                startIcon={<SearchIcon className=\"w-4 h-4 text-emerald-600\" />}
+                startIcon={<SearchIcon className="w-4 h-4" />}
                 sx={{
-                  background: 'linear-gradient(to right, #ecfdf5, #ccfbf1)',
-                  borderColor: '#a7f3d0',
+                  bgcolor: '#D4EDDA',
+                  borderColor: '#C3E6CB',
+                  color: '#155724',
+                  fontWeight: 500,
                   '&:hover': {
-                    background: 'linear-gradient(to right, #d1fae5, #99f6e4)',
+                    bgcolor: '#C3E6CB',
+                    borderColor: '#B8DAFF',
                   },
                 }}
               >
                 Browse Functions ({dslFunctions.length})
               </Button>
               <Button 
-                variant=\"outlined\" 
-                size=\"small\" 
+                variant="outlined" 
+                size="small" 
                 onClick={() => setShowCustomFunctionBuilder(true)}
-                data-testid=\"custom-function-builder-button\"
-                startIcon={<Brackets className=\"w-4 h-4 text-purple-600\" />}
+                data-testid="custom-function-builder-button"
+                startIcon={<Brackets className="w-4 h-4" />}
                 sx={{
-                  background: 'linear-gradient(to right, #faf5ff, #ede9fe)',
-                  borderColor: '#e9d5ff',
+                  bgcolor: '#14213D',
+                  borderColor: '#14213D',
+                  color: '#FFFFFF',
+                  fontWeight: 500,
                   '&:hover': {
-                    background: 'linear-gradient(to right, #f3e8ff, #ddd6fe)',
+                    bgcolor: '#1D3557',
+                    borderColor: '#1D3557',
                   },
                 }}
               >
                 Build Function
               </Button>
               <Button 
-                variant=\"outlined\" 
-                size=\"small\" 
+                variant="outlined" 
+                size="small" 
                 onClick={(e) => setSettingsAnchorEl(e.currentTarget)}
-                data-testid=\"settings-button\"
-                startIcon={<Settings className=\"w-4 h-4\" />}
-                endIcon={<ChevronDown className=\"w-3 h-3\" />}
+                data-testid="settings-button"
+                startIcon={<Settings className="w-4 h-4" />}
+                endIcon={<ChevronDown className="w-3 h-3" />}
+                sx={{
+                  borderColor: '#CED4DA',
+                  color: '#495057',
+                  fontWeight: 500,
+                  '&:hover': {
+                    borderColor: '#ADB5BD',
+                    bgcolor: '#F8F9FA',
+                  },
+                }}
               >
                 Settings
               </Button>
@@ -409,16 +432,24 @@ const Dashboard = ({ onSignOut }) => {
                 anchorEl={settingsAnchorEl}
                 open={Boolean(settingsAnchorEl)}
                 onClose={() => setSettingsAnchorEl(null)}
-                data-testid=\"settings-menu\"
+                data-testid="settings-menu"
+                PaperProps={{
+                  sx: {
+                    borderRadius: '8px',
+                    border: '1px solid #E9ECEF',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  }
+                }}
               >
                 <MenuItem
                   onClick={() => {
                     handleLoadSampleData();
                     setSettingsAnchorEl(null);
                   }}
-                  data-testid=\"menu-sample-data\"
+                  data-testid="menu-sample-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Sparkles className=\"w-4 h-4 text-blue-600 mr-2\" />
+                  <Sparkles className="w-4 h-4 text-[#5B5FED] mr-2" />
                   Test with Sample Data
                 </MenuItem>
                 <MenuItem
@@ -426,9 +457,10 @@ const Dashboard = ({ onSignOut }) => {
                     handleClearAllData();
                     setSettingsAnchorEl(null);
                   }}
-                  data-testid=\"menu-clear-data\"
+                  data-testid="menu-clear-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Trash2 className=\"w-4 h-4 text-red-600 mr-2\" />
+                  <Trash2 className="w-4 h-4 text-[#DC3545] mr-2" />
                   Clear All Data
                 </MenuItem>
                 <MenuItem
@@ -436,9 +468,10 @@ const Dashboard = ({ onSignOut }) => {
                     setShowEventDataViewer(true);
                     setSettingsAnchorEl(null);
                   }}
-                  data-testid=\"menu-view-data\"
+                  data-testid="menu-view-data"
+                  sx={{ fontSize: '0.875rem', py: 1.5 }}
                 >
-                  <Database className=\"w-4 h-4 text-cyan-600 mr-2\" />
+                  <Database className="w-4 h-4 text-[#17A2B8] mr-2" />
                   View Data
                 </MenuItem>
               </Menu>
@@ -447,44 +480,44 @@ const Dashboard = ({ onSignOut }) => {
         </div>
 
         {/* Main Content Area */}
-        <div className=\"flex-1 flex overflow-hidden min-w-0\">
+        <div className="flex-1 flex overflow-hidden min-w-0">
           {/* Center - Editor and Console */}
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'white', px: 3 }}>
               <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
                 <Tab 
-                  icon={<Upload className=\"w-4 h-4\" />} 
-                  iconPosition=\"start\" 
-                  label=\"Upload Data\" 
-                  data-testid=\"upload-tab\"
+                  icon={<Upload className="w-4 h-4" />} 
+                  iconPosition="start" 
+                  label="Upload Data" 
+                  data-testid="upload-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />
                 <Tab 
-                  icon={<Code className=\"w-4 h-4\" />} 
-                  iconPosition=\"start\" 
-                  label=\"DSL Editor\" 
-                  data-testid=\"editor-tab\"
+                  icon={<Code className="w-4 h-4" />} 
+                  iconPosition="start" 
+                  label="DSL Editor" 
+                  data-testid="editor-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />
                 <Tab 
-                  icon={<List className=\"w-4 h-4\" />} 
-                  iconPosition=\"start\" 
-                  label=\"Templates\" 
-                  data-testid=\"templates-tab\"
+                  icon={<List className="w-4 h-4" />} 
+                  iconPosition="start" 
+                  label="Templates" 
+                  data-testid="templates-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />
                 <Tab 
-                  icon={<BarChart3 className=\"w-4 h-4\" />} 
-                  iconPosition=\"start\" 
-                  label=\"Transaction Reports\" 
-                  data-testid=\"reports-tab\"
+                  icon={<BarChart3 className="w-4 h-4" />} 
+                  iconPosition="start" 
+                  label="Transaction Reports" 
+                  data-testid="reports-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />
                 <Tab 
-                  icon={<Lightbulb className=\"w-4 h-4\" />} 
-                  iconPosition=\"start\" 
-                  label=\"Examples\" 
-                  data-testid=\"examples-tab\"
+                  icon={<Lightbulb className="w-4 h-4" />} 
+                  iconPosition="start" 
+                  label="Examples" 
+                  data-testid="examples-tab"
                   sx={{ textTransform: 'none', fontSize: '0.875rem' }}
                 />
               </Tabs>
@@ -499,26 +532,26 @@ const Dashboard = ({ onSignOut }) => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
-              <div className=\"flex-1 bg-[#0A0A0A] min-w-0\" data-testid=\"dsl-editor\">
+              <div className="flex-1 bg-[#0A0A0A] min-w-0" data-testid="dsl-editor">
                 <Editor
-                  height=\"100%\"
-                  defaultLanguage=\"python\"
+                  height="100%"
+                  defaultLanguage="python"
                   value={dslCode}
-                  onChange={(value) => setDslCode(value || \"\")}
-                  theme=\"vs-dark\"
+                  onChange={(value) => setDslCode(value || "")}
+                  theme="vs-dark"
                   options={{
                     fontSize: 14,
-                    fontFamily: \"monospace\",
+                    fontFamily: "monospace",
                     minimap: { enabled: false },
-                    lineNumbers: \"on\",
+                    lineNumbers: "on",
                     scrollBeyondLastLine: false,
                     automaticLayout: true,
-                    wordWrap: \"on\",
+                    wordWrap: "on",
                     tabSize: 2,
                     insertSpaces: true,
-                    renderWhitespace: \"none\",
-                    cursorStyle: \"line\",
-                    cursorBlinking: \"blink\",
+                    renderWhitespace: "none",
+                    cursorStyle: "line",
+                    cursorBlinking: "blink",
                     fixedOverflowWidgets: true,
                   }}
                   beforeMount={(monaco) => {
@@ -538,7 +571,7 @@ const Dashboard = ({ onSignOut }) => {
                         });
 
                         const helperFunctions = [
-                          { name: 'lag', params: \"col, offset, default\", description: 'Get previous row value in schedule' },
+                          { name: 'lag', params: "col, offset, default", description: 'Get previous row value in schedule' },
                           { name: 'schedule', params: 'period_def, columns, context?', description: 'Generate a schedule of periods and computed columns' },
                           { name: 'schedule_sum', params: 'sched, col', description: 'Sum a schedule column' },
                           { name: 'schedule_first', params: 'sched, col', description: 'First value of schedule column' },
@@ -663,12 +696,12 @@ const Dashboard = ({ onSignOut }) => {
           </Box>
 
           {/* Right Sidebar - Chat Assistant */}
-          <div className=\"flex-shrink-0\">
+          <div className="flex-shrink-0 chat-panel-enter">
             <ChatAssistant 
               ref={chatAssistantRef}
               dslFunctions={dslFunctions} 
               events={events}
-              onInsertCode={(code) => setDslCode(prev => prev + \"\\n\" + code)}
+              onInsertCode={(code) => setDslCode(prev => prev + "\\n" + code)}
               onOverwriteCode={(code) => setDslCode(code)}
               editorCode={dslCode}
               consoleOutput={consoleOutput}
@@ -687,12 +720,14 @@ const Dashboard = ({ onSignOut }) => {
         />
       )}
 
+      {/* CustomFunctionBuilder temporarily disabled due to Tooltip migration issues
       {showCustomFunctionBuilder && (
         <CustomFunctionBuilder 
           onClose={() => setShowCustomFunctionBuilder(false)}
           onFunctionSaved={loadDslFunctions}
         />
       )}
+      */}
 
       {showEventDataViewer && (
         <EventDataViewer 

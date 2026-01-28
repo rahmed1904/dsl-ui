@@ -1,23 +1,10 @@
 import React, { useState } from "react";
 import { useToast } from "../components/ToastProvider";
-import { 
-  Lock as LockIcon, 
-  Mail as MailIcon, 
-  Visibility as EyeIcon, 
-  VisibilityOff as EyeOffIcon 
-} from '@mui/icons-material';
-import { 
-  Button, 
-  TextField, 
-  Card, 
-  CardContent, 
-  InputAdornment, 
-  IconButton 
-} from '@mui/material';
+import { Lock as LockIcon, Mail as MailIcon, Visibility as EyeIcon, VisibilityOff as EyeOffIcon } from '@mui/icons-material';
+import { Button, TextField, Card, CardContent, InputAdornment, IconButton, Box, Typography } from '@mui/material';
 
 const FYNTRAC_LOGO = "https://customer-assets.emergentagent.com/job_code-finance-2/artifacts/hdj19r3w_Fyntrac%20%28600%20x%20400%20px%29%20%284%29.png";
 
-// Hardcoded credentials
 const VALID_USER = {
   email: "admin@fyntrac.com",
   password: "Funrun21@19b"
@@ -34,11 +21,9 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if (email === VALID_USER.email && password === VALID_USER.password) {
-      // Store login state
       localStorage.setItem("fyntrac_user", JSON.stringify({ email }));
       toast.success("Welcome to DSL Studio!");
       onLogin({ email });
@@ -50,48 +35,45 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4" 
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: '#F8F9FA',
+        p: 3
+      }}
       data-testid="login-page"
     >
       <Card 
         sx={{ 
-          maxWidth: 448, 
-          width: '100%', 
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
+          maxWidth: 420, 
+          width: '100%',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         }}
       >
         <CardContent sx={{ p: 4 }}>
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
             <img 
               src={FYNTRAC_LOGO} 
               alt="Fyntrac" 
-              className="h-16 w-auto object-contain"
+              style={{ height: 48, marginBottom: 24 }}
               data-testid="login-logo"
             />
-          </div>
-
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 
-              className="text-2xl font-bold text-slate-900" 
-              style={{ fontFamily: 'Manrope' }}
-            >
+            <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 700, mb: 1 }}>
               DSL Studio
-            </h1>
-            <p className="text-sm text-slate-600 mt-2">
-              Sign in to your account
-            </p>
-          </div>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Sign in to continue
+            </Typography>
+          </Box>
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+          <form onSubmit={handleLogin}>
+            <Box sx={{ mb: 2.5 }}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500, color: 'text.primary' }}>
                 Email Address
-              </label>
+              </Typography>
               <TextField
                 fullWidth
                 type="email"
@@ -104,17 +86,17 @@ const Login = ({ onLogin }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <MailIcon sx={{ color: '#94a3b8', fontSize: '1.25rem' }} />
+                      <MailIcon sx={{ color: '#6C757D', fontSize: '1.25rem' }} />
                     </InputAdornment>
                   ),
                 }}
               />
-            </div>
+            </Box>
 
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500, color: 'text.primary' }}>
                 Password
-              </label>
+              </Typography>
               <TextField
                 fullWidth
                 type={showPassword ? "text" : "password"}
@@ -127,7 +109,7 @@ const Login = ({ onLogin }) => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockIcon sx={{ color: '#94a3b8', fontSize: '1.25rem' }} />
+                      <LockIcon sx={{ color: '#6C757D', fontSize: '1.25rem' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -138,15 +120,15 @@ const Login = ({ onLogin }) => {
                         size="small"
                       >
                         {showPassword ? 
-                          <EyeOffIcon sx={{ fontSize: '1.25rem' }} /> : 
-                          <EyeIcon sx={{ fontSize: '1.25rem' }} />
+                          <EyeOffIcon sx={{ fontSize: '1.25rem', color: '#6C757D' }} /> : 
+                          <EyeIcon sx={{ fontSize: '1.25rem', color: '#6C757D' }} />
                         }
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-            </div>
+            </Box>
 
             <Button
               type="submit"
@@ -155,26 +137,25 @@ const Login = ({ onLogin }) => {
               disabled={loading}
               data-testid="login-submit"
               sx={{
-                background: 'linear-gradient(to right, #2563eb, #6366f1)',
-                '&:hover': {
-                  background: 'linear-gradient(to right, #1d4ed8, #4f46e5)',
-                },
-                py: 1.5,
+                py: 1.25,
                 fontSize: '0.875rem',
                 fontWeight: 500,
+                bgcolor: '#5B5FED',
+                '&:hover': {
+                  bgcolor: '#4346C8',
+                },
               }}
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
-          {/* Footer */}
-          <p className="text-xs text-slate-500 text-center mt-6">
-            Design calculation logic with custom DSL functions
-          </p>
+          <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 3, color: 'text.secondary' }}>
+            Domain Specific Language Studio for Finance
+          </Typography>
         </CardContent>
       </Card>
-    </div>
+    </Box>
   );
 };
 
