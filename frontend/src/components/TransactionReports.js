@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box } from '@mui/material';
-import { Download, FileText, Clock, Trash2, TrendingUp, Close as CloseIcon } from "lucide-react";
+import { Download, FileText, Clock, Trash2, TrendingUp, X as CloseIcon } from "lucide-react";
 
 const PageSizeOptions = [5, 10, 25, 50];
 
