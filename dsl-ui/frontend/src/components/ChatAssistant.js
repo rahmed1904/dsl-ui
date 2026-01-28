@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { toast } from "sonner";
+import { useToast } from "./ToastProvider";
 import { Send, User, Code, Copy, Check, RefreshCw, Sparkles, Eye, EyeOff, Zap, BookOpen, Calculator } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Button, Box, Chip } from '@mui/material';
 
 const API = '/api';
 
