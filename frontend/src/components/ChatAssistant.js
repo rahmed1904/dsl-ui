@@ -75,6 +75,13 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
         editor_code: editorCode || "",
         console_output: consoleOutput || [],
         dsl_functions: dslFunctions || [],
+        helper_docs: {
+          days_to_next: {
+            description: "Calculate signed days from current row date to next row date (returns default when next is missing).",
+            usage: "days_to_next(current_date, next_date, default=0)",
+            note: "Accepts YYYY-MM-DD strings or datetime values; returns integer days."
+          }
+        },
         ai_requirements: "IMPORTANT: Follow these code-generation rules for ALL DSL examples: use ## for inline comments (never //), do NOT create transactions or call createTransaction/createTransactions unless the user explicitly asks for them, compute required values and use print() to output the final variable when transactions are NOT requested, use only DSL functions supported by both frontend and backend, never output Python or other languages, and ensure code is syntactically valid and runnable. Wrap code in ```dsl blocks when providing examples."
       };
 

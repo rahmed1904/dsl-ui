@@ -167,6 +167,12 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
                     {func.description}
                   </Typography>
+                  {/* Small usage hint for days_to_next helper */}
+                  {func.name === 'days_to_next' && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                      Example: days_to_next(period_date, period_start) → numeric days to next period (0 when missing)
+                    </Typography>
+                  )}
                   <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       variant="outlined"

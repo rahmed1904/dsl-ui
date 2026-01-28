@@ -9,6 +9,20 @@ const API = '/api';
 const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent, onViewEvent }) => {
   const [eventFile, setEventFile] = useState(null);
   const [excelDataFile, setExcelDataFile] = useState(null);
+  const [uploadedEventFileName, setUploadedEventFileName] = useState('');
+  const [uploadedExcelFileName, setUploadedExcelFileName] = useState('');
+
+  // Restore persisted uploaded filenames so they survive hard refresh
+  useEffect(() => {
+    try {
+      const ev = localStorage.getItem('uploadedEventFileName');
+      const ex = localStorage.getItem('uploadedExcelFileName');
+      if (ev) setUploadedEventFileName(ev);
+      if (ex) setUploadedExcelFileName(ex);
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, []);
   const [uploading, setUploading] = useState(false);
   const [eventDataSummary, setEventDataSummary] = useState([]);
   const hasEvents = events && events.length > 0;
@@ -41,6 +55,11 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
       const response = await axios.post(`${API}/events/upload`, formData);
       toast.success(response.data.message);
       addConsoleLog(`✓ ${response.data.message}`, "success");
+      // Persist filename for display after upload completes
+      if (eventFile && eventFile.name) {
+        setUploadedEventFileName(eventFile.name);
+        try { localStorage.setItem('uploadedEventFileName', eventFile.name); } catch (e) {}
+      }
       setEventFile(null);
       onUploadSuccess();
     } catch (error) {
@@ -81,6 +100,11 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
         });
       }
       
+      // Persist filename for display after upload completes
+      if (excelDataFile && excelDataFile.name) {
+        setUploadedExcelFileName(excelDataFile.name);
+        try { localStorage.setItem('uploadedExcelFileName', excelDataFile.name); } catch (e) {}
+      }
       setExcelDataFile(null);
       onUploadSuccess();
     } catch (error) {
@@ -172,6 +196,12 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
                   {eventFile ? eventFile.name : 'Choose CSV file...'}
                 </Button>
               </label>
+              {uploadedEventFileName && (
+                <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+                  <CheckCircle size={12} />
+                  {uploadedEventFileName}
+                </Typography>
+              )}
             </Box>
             <Button 
               onClick={handleUploadEvents} 
@@ -240,6 +270,12 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent
               <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
                 <CheckCircle size={12} />
                 {excelDataFile.name}
+              </Typography>
+            )}
+            {uploadedExcelFileName && !excelDataFile && (
+              <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                <CheckCircle size={12} />
+                {uploadedExcelFileName}
               </Typography>
             )}
             <Button 

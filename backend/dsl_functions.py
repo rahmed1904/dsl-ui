@@ -772,6 +772,38 @@ def days_between(d1: Any, d2: Any) -> int:
     except Exception:
         return 0
 
+def days_to_next(d_current: Any, d_next: Any, default: int = 0) -> int:
+    """
+    Calculate signed days difference from current line item's date to next line item's date.
+
+    - Parses inputs using `normalize_date` (accepts YYYY-MM-DD strings, datetimes, etc.).
+    - Returns `(next - current).days` (can be negative if next < current).
+    - If `d_next` is None/empty/invalid, returns `default`.
+    - If either date cannot be parsed, returns `default`.
+    """
+    try:
+        n_curr = normalize_date(d_current)
+    except Exception:
+        n_curr = ''
+    try:
+        n_next = normalize_date(d_next)
+    except Exception:
+        n_next = ''
+
+    # If next date missing or invalid, return configurable default
+    if not n_next:
+        return default
+
+    if not n_curr:
+        return default
+
+    try:
+        dt_curr = datetime.fromisoformat(n_curr)
+        dt_next = datetime.fromisoformat(n_next)
+        return (dt_next - dt_curr).days
+    except Exception:
+        return default
+
 def months_between(d1: str, d2: str) -> int:
     # Handle empty or invalid date strings gracefully
     try:
@@ -3017,6 +3049,7 @@ DSL_FUNCTIONS = {
     # Date
     'normalize_date': normalize_date,
     'days_between': days_between, 'months_between': months_between, 'years_between': years_between,
+    'days_to_next': days_to_next,
     'add_days': add_days, 'add_months': add_months, 'add_years': add_years,
     'subtract_days': subtract_days, 'subtract_months': subtract_months, 'subtract_years': subtract_years,
     'start_of_month': start_of_month, 'end_of_month': end_of_month,
@@ -3154,6 +3187,7 @@ DSL_FUNCTION_METADATA = [
     # Date (19)
     # (Removed duplicate normalize_date entry)
     {"name": "days_between", "params": "d1, d2", "description": "Days between dates", "category": "Date"},
+    {"name": "days_to_next", "params": "current_date, next_date, default=0", "description": "Signed days from current row date to next row date; returns default when next is missing", "category": "Date"},
     {"name": "months_between", "params": "d1, d2", "description": "Months between", "category": "Date"},
     {"name": "years_between", "params": "d1, d2", "description": "Years between", "category": "Date"},
     {"name": "add_days", "params": "d, n", "description": "Add days to date", "category": "Date"},
