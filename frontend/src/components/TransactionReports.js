@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell, Pagination } from '@mui/material';
+import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell, Pagination, Tooltip } from '@mui/material';
 import { Download, FileText, Clock, Trash2, TrendingUp, X as CloseIcon } from "lucide-react";
 
 const PageSizeOptions = [10, 25, 50, 100];
@@ -91,14 +91,18 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
                     >
                       View Details
                     </Button>
-                    <IconButton
-                      size="small"
-                      onClick={() => onDeleteReport(report.id, report.template_name)}
-                      sx={{ color: '#DC3545' }}
-                      data-testid={`delete-report-${report.id}`}
-                    >
-                      <Trash2 size={16} />
-                    </IconButton>
+                    <Tooltip title="Delete">
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={() => onDeleteReport(report.id, report.template_name)}
+                          sx={{ color: '#6C757D' }}
+                          data-testid={`delete-report-${report.id}`}
+                        >
+                          <Trash2 size={16} />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
                   </Box>
                 </Box>
 

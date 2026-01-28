@@ -41,7 +41,9 @@ const TemplatesPanel = ({ templates, onLoadTemplate, onRunTemplate, onDeleteTemp
                       </Typography>
                     </Box>
                   </Box>
-                  <IconButton
+                  <Tooltip title="Delete">
+                    <span>
+                      <IconButton
                     size="small"
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -61,12 +63,14 @@ const TemplatesPanel = ({ templates, onLoadTemplate, onRunTemplate, onDeleteTemp
                         });
                       }
                     }}
-                    sx={{ color: '#DC3545' }}
+                    sx={{ color: '#6C757D' }}
                     data-testid={`delete-template-${template.id}`}
                     disabled={deletingIds.has(template.id)}
                   >
                     <Trash2 size={16} />
-                  </IconButton>
+                      </IconButton>
+                    </span>
+                  </Tooltip>
                   <Tooltip title="Deploy model">
                     <span>
                       <IconButton
