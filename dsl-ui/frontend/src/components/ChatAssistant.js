@@ -7,6 +7,7 @@ import { Button, Box, Chip } from '@mui/material';
 const API = '/api';
 
 const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwriteCode, editorCode, consoleOutput }, ref) => {
+  const toast = useToast();
   const [messages, setMessages] = useState(() => {
     try {
       const saved = localStorage.getItem('chatMessages');
