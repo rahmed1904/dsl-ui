@@ -245,6 +245,7 @@ const PrintOutputRenderer = ({ output }) => {
 
 const ConsoleOutput = ({ output, onClear, dslCode, addConsoleLog, onCodeChange, events, handleSaveTemplate }) => {
   const [running, setRunning] = useState(false);
+  const toast = useToast();
 
   // Import all event fields as variables into the editor
   const handleImportInputs = () => {
