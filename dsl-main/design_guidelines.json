@@ -1,0 +1,131 @@
+{
+  "identity": {
+    "persona": "E1",
+    "role": "Anti-AI Creative Designer",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Manrope",
+        "weights": ["600", "700", "800"],
+        "usage": "Page titles, section headers, widget titles"
+      },
+      "body": {
+        "family": "IBM Plex Sans",
+        "weights": ["400", "500"],
+        "usage": "General text, labels, table data"
+      },
+      "code": {
+        "family": "JetBrains Mono",
+        "weights": ["400", "500"],
+        "usage": "DSL editor, console output, technical references"
+      }
+    },
+    "rules": [
+      "Headings > 32px must use tracking-tight",
+      "Overlines/Labels must be Uppercase + tracking-widest + text-xs",
+      "Line height: tight for headers, relaxed for body"
+    ]
+  },
+  "colors": {
+    "theme_strategy": "Hybrid (Light Mode Base + Dark Mode Editor)",
+    "palette": {
+      "primary": {
+        "name": "Trust Navy",
+        "hex": "#0F172A",
+        "tailwind": "bg-slate-900"
+      },
+      "accent": {
+        "name": "Electric Blue",
+        "hex": "#2563EB",
+        "tailwind": "text-blue-600"
+      },
+      "success": {
+        "name": "Growth Green",
+        "hex": "#059669",
+        "tailwind": "text-emerald-600"
+      },
+      "error": {
+        "name": "Loss Red",
+        "hex": "#DC2626",
+        "tailwind": "text-red-600"
+      },
+      "background": {
+        "light": "#FFFFFF",
+        "subtle": "#F8FAFC",
+        "dark_editor": "#0A0A0A"
+      }
+    },
+    "gradients": {
+      "forbidden": "No full-screen gradients. No dark gradients.",
+      "allowed": "Subtle mesh gradients in light mode for hero sections only."
+    }
+  },
+  "layout": {
+    "grid_system": {
+      "dashboard": "Bento Grid Mode B (High Density)",
+      "editor": "3-Column IDE Layout (Sidebar | Editor | Assistant)"
+    },
+    "spacing": {
+      "scale": "Generous (2x standard)",
+      "rules": "Containers with borders must have internal padding (p-6 or p-8)."
+    },
+    "containers": {
+      "card_style": "Flat, 1px border (border-slate-200), no shadow or very subtle shadow-sm. Sharp or slightly rounded corners (rounded-md)."
+    }
+  },
+  "components": {
+    "library": "shadcn/ui",
+    "customization": {
+      "radius": "0.3rem",
+      "shadows": "none",
+      "borders": "1px solid #E2E8F0"
+    },
+    "specifics": {
+      "buttons": "Sharp or slightly rounded. Primary: Solid Navy. Secondary: Outline Slate.",
+      "inputs": "Flat, 1px border. Focus ring: Blue-500.",
+      "cards": "Go cardless where possible. Use whitespace dividers.",
+      "tables": "Dense, high contrast headers. Zebra striping optional but preferred for finance data."
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Subtle noise overlay on dark editor backgrounds.",
+    "glassmorphism": "Use only for sticky headers/overlays. High saturation blur.",
+    "motion": {
+      "transitions": "transition-all duration-200 ease-out",
+      "micro_interactions": "Hover lift (-1px) on interactive cards."
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px or 2px. Consistent sizing."
+    },
+    "images": [
+      {
+        "category": "background",
+        "url": "https://images.unsplash.com/photo-1762279389002-7b6abd7bd6c6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMGZpbmFuY2UlMjB0ZWNobm9sb2d5JTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3Njg2NTAyNTB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract geometric finance background for login or empty states"
+      }
+    ]
+  },
+  "universal_guidelines": [
+    "Avoid 'AI slop' aesthetic (generic centered layouts, gradients).",
+    "Use depth through z-index and layered elements.",
+    "NO 'transition: all'. Animate specific properties.",
+    "NO text-align: center on the main App container.",
+    "Use 'sonner' for toasts.",
+    "All interactive elements MUST have data-testid attributes.",
+    "Respect prefers-reduced-motion.",
+    "Ensure WCAG AA contrast ratios (4.5:1 for normal text)."
+  ],
+  "instructions_to_main_agent": "Implement the dashboard using a sidebar layout. The central area is the DSL Editor (Monaco Editor or similar text area styled as code). The right panel is the AI Assistant. Use the 'Manrope' font for headings and 'IBM Plex Sans' for body. Default to Light Mode for the app shell, but make the Code Editor component Dark Mode by default for contrast."
+}

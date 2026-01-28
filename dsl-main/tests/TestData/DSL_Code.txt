@@ -1,0 +1,248 @@
+docker stop mongodb && docker rm mongodb
+
+
+// ═══════════════════════════════════════════
+// Imported Event Fields
+// ═══════════════════════════════════════════
+
+// INT_ACC Fields
+INT_ACC_postingdate = INT_ACC.postingdate
+INT_ACC_effectivedate = INT_ACC.effectivedate
+int_rate_current = INT_ACC.ATTRIBUTE_INTEREST_RATE_CURRENT
+unpaid_principal_balance = INT_ACC.BALANCES_ENDINGBALANCE_Unpaid_Principal_Balance
+accrued_interest_receivable = INT_ACC.BALANCES_ENDINGBALANCE_Accrued_Interest_Receivable
+servicing_interest_accrual = INT_ACC.BALANCES_ENDINGBALANCE_Servicing_Interest_Accrual
+
+// PMT Fields
+PMT_postingdate = PMT.postingdate
+PMT_effectivedate = PMT.effectivedate
+pmt_remit = PMT.TRANSACTIONS_AMOUNT_REMIT
+
+// ORG Fields
+ORG_postingdate = ORG.postingdate
+ORG_effectivedate = ORG.effectivedate
+Purchase_upb = ORG.ATTRIBUTE_LOAN_AMOUNT_CURRENT
+Purchase_air = ORG.ATTRIBUTE_INTEREST_RECEIVABLE_CONSUMER_CURRENT
+
+// ═══════════════════════════════════════════
+// Your DSL Code Below
+// ═══════════════════════════════════════════
+
+
+Payment_interest = min(pmt_remit, accrued_interest_receivable)*-1
+payment_principal = max(pmt_remit+Payment_interest, 0)*-1
+
+InterestAccrual = ((unpaid_principal_balance+payment_principal)*int_rate_current)/36000
+
+// ═══════════════════════════════════════════
+// Transaction Outputs
+// ═══════════════════════════════════════════
+
+
+createTransaction(ORG_postingdate , ORG_effectivedate, "Purchase_Principal", Purchase_upb)
+
+createTransaction(ORG_postingdate , ORG_effectivedate, "Purchase_Interest", Purchase_air)
+
+createTransaction(PMT_postingdate, PMT_effectivedate, "Payment_Interest", Payment_interest)
+
+createTransaction(PMT_postingdate, PMT_effectivedate, "Payment_Principal", payment_principal)
+
+createTransaction(INT_ACC_postingdate , INT_ACC_effectivedate, "Interest_Accrual", InterestAccrual)
+
+
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// IMPORTED EVENT FIELDS
+// ═══════════════════════════════════════════════════════════════
+
+// ─── EOD Single Values (merged/latest row) ───
+EOD_postingdate = EOD.postingdate
+EOD_effectivedate = EOD.effectivedate
+EOD_subinstrumentid = EOD.subinstrumentid
+EOD_BILLING = EOD.BILLING
+print(EOD_BILLING)
+EOD_UNBILLED = EOD.UNBILLED
+print(EOD_UNBILLED)
+EOD_REVENUE = collect_by_instrument(EOD.REVENUE)
+print(EOD_REVENUE)
+
+
+# ─── REV Single Values (merged/latest row) ───
+posting_date = REV.postingdate
+
+# ─── REV Collected Arrays (all rows for instrument) ───
+REV_effectivedates_arr = collect_by_instrument(REV.effectivedate)
+subinstrument_ids = collect_subinstrumentids()
+print(subinstrument_ids)
+product_names = collect_by_instrument(REV.PRODUCT_NAME)
+print(product_names)
+REV_SALE_PRICE_arr = collect_by_instrument(REV.SALE_PRICE)
+REV_QUANTITY_arr = collect_by_instrument(REV.QUANTITY)
+esp_values = collect_by_instrument(REV.EXTENDED_SALEPRICE)
+print(esp_values)
+start_dates = collect_by_instrument(REV.ITEM_STARTDATE)
+end_dates = collect_by_instrument(REV.ITEM_ENDDATE)
+
+# ============================================================================
+# SECTION 1: REVENUE ALLOCATION
+# ============================================================================
+
+ssp_values = map_array(product_names, "name", "iif(eq_ignore_case(name, 'discount'), 0, array_get(esp_values, index, 0))", {"esp_values": esp_values})
+total_ssp = sum(ssp_values)
+alloc_pcts = map_array(ssp_values, "ssp", "iif(gt(total_ssp, 0), divide(ssp, total_ssp), 0)", {"total_ssp": total_ssp})
+total_esp = sum(esp_values)
+allocated_revenues = map_array(alloc_pcts, "pct", "multiply(pct, total_esp)", {"total_esp": total_esp})
+
+print("Allocated Revenues:", allocated_revenues)
+
+
+
+
+# ============================================================================
+# SECTION 2: GENERATE SCHEDULES
+# ============================================================================
+
+schedule_columns = {
+    "period_date": "period_date",
+    "month_end": "end_of_month(period_date)",
+    "days": "iif(eq(start_date, end_date), add(days_between(start_of_month(period_date), end_of_month(period_date)), 1), iif(eq(period_index, 0), days_between(start_date, end_of_month(start_date)), iif(eq(period_index, subtract(total_periods, 1)), add(days_between(start_of_month(end_date), end_date), 1), add(days_between(start_of_month(period_date), end_of_month(period_date)), 1))))",
+    "LTD_days": "iif(eq(normalize_date(start_date), normalize_date(end_date)), add(days_between(start_of_month(start_date), end_of_month(end_date)), 1), iif(eq(normalize_date(period_date), normalize_date(end_date)), days_between(start_date, end_date), days_between(start_date, end_of_month(period_date))))",
+    "daily_revenue": "iif(eq(normalize_date(start_date), normalize_date(end_date)), divide(amount, days), divide(amount, 365))",
+    "period_revenue": "multiply(multiply(daily_revenue, days), -1)",
+    "LTD_revenue": "multiply(iif(lt(normalize_date(period_date), normalize_date(subtract_months(posting_date, 1))), multiply(daily_revenue, days), 0), -1)"
+
+
+}
+
+schedule_results = generate_schedules(
+    allocated_revenues,
+    start_dates,
+    end_dates,
+    schedule_columns,
+    "M",
+    {"posting_date": posting_date},
+    product_names,
+    subinstrument_ids
+)
+
+all_schedules = get_schedules_array(schedule_results)
+print_all_schedules(all_schedules, product_names)
+
+# ============================================================================
+# SECTION 3: REVENUE RECOGNITION
+# ============================================================================
+
+recognition_results = find_period_amounts(schedule_results, posting_date, "period_revenue", )
+print("Recognition Results:", recognition_results)
+
+
+# Sum LTD_revenue for each schedule separately
+
+recognition_results_LTD = get_schedule_totals(schedule_results, "LTD_revenue")
+
+print(recognition_results_LTD)
+# ============================================================================
+# SECTION 4: CREATE TRANSACTIONS
+# ============================================================================
+
+create_schedule_transactions(recognition_results, posting_date, "Revenue Recognition")
+
+# ============================================================================
+# SECTION 5: UNBILLED CHARGE
+# ============================================================================
+
+# Sum the period_amount field from recognition results
+total_revenue = sum_field(recognition_results, "period_amount")
+
+# Create unbilled charge as negative of total revenue
+unbilled_charge = multiply(total_revenue, -1)
+
+# ─── Check if EOD_UNBILLED is less than EOD_BILLING
+Unbilled_amount = iif(gt(add(EOD_UNBILLED, unbilled_charge) , EOD_BILLING), unbilled_charge, multiply(EOD_UNBILLED, -1))
+
+print("Total Revenue:", total_revenue)
+print("Unbilled Charge:", unbilled_charge)
+print("Unbilled amount:", Unbilled_amount)
+# Create the unbilled charge transaction
+createTransaction(posting_date, posting_date, "Unbilled Charge", Unbilled_amount, "0")
+
+# ============================================================================
+# SECTION 6: REVENUE ADJUSTMENTS
+# ============================================================================
+
+for_each_with_index(product_names, "product", "createTransaction(posting_date, posting_date, 'Revenue Adjustment', subtract(array_get(recognition_results_LTD, index, 0), array_get(EOD_REVENUE, index, 0)), array_get(subinstrument_ids, index, '1'))", {
+        "EOD_REVENUE": EOD_REVENUE,
+        "recognition_results_LTD": recognition_results_LTD,
+        "posting_date": posting_date,
+        "subinstrument_ids": subinstrument_ids
+    })
+
+
+
+# ─── ECF Single Values (merged/latest row) ───
+
+MeasurementType = collect_by_instrument(ECF.MeasurementType)
+StartDate = collect_by_instrument(ECF.StartDate)
+ExpectedCF = collect_by_instrument(ECF.ExpectedCF)
+
+# ─── EOD Single Values (merged/latest row) ───
+postingdate = EOD.postingdate
+effectivedate = EOD.effectivedate
+subinstrumentid = EOD.subinstrumentid
+OriginationDate = EOD.OriginationDate
+LoanAmount = EOD.LoanAmount
+Term = EOD.Term
+NoteRate = EOD.NoteRate
+UPB = iif(eq(normalize_date(OriginationDate),normalize_date(postingdate)),LoanAmount,EOD.UPB)
+priotImpairment = EOD.Impairment
+Monthly_Rate = NoteRate/1200
+PMT_AM = pmt(Monthly_Rate,Term,-LoanAmount)
+First_Month = months_between(normalize_date(OriginationDate),normalize_date(postingdate))
+maturitydate = add_months(normalize_date(OriginationDate),Term)
+
+# --- Define the period
+p = period(postingdate, maturitydate, "M")
+
+#---- Create the schedule
+sched = iif(eq(normalize_date(OriginationDate),normalize_date(postingdate)),0,schedule(p, {
+        "period_date": "period_date",
+        "month_end": "end_of_month(period_date)",
+        "monthNumber": "iif(eq(period_index,0),First_Month,lag('monthNumber',1,First_Month)+1)",
+        "openingBalance": "iif(eq(period_index,0),UPB,lag('closingBalance',1,0))",
+         "interestAccrued": "multiply(openingBalance,Monthly_Rate)",
+         "contractualCF": "iif(eq(normalize_date(month_end),normalize_date(maturitydate)),add(interestAccrued,lag('closingBalance',1,0)),PMT_AM)",
+              "ExpectedCFA": "lookup(ExpectedCF, normalize_arraydate(StartDate), normalize_date(month_end))",
+              "principalPayment": "contractualCF-interestAccrued",
+              "closingBalance": "subtract(openingBalance,principalPayment)",
+              "discountFactor": "1/pow(1+Monthly_Rate, monthNumber)",
+              "PV_CCF": "multiply(discountFactor,contractualCF)",
+              "PV_ECF": "multiply(discountFactor,ExpectedCFA)",
+              "impairmentCurrent": "subtract(PV_ECF,PV_CCF)"
+
+        
+    }, {"postingdate": postingdate, "UPB": UPB, "Monthly_Rate":Monthly_Rate, "PMT_AM":PMT_AM, "ExpectedCF": ExpectedCF, "StartDate":StartDate, "maturitydate":maturitydate,"First_Month":First_Month}))
+
+
+#----- Print the schedule
+print(sched)
+
+PeriodImpairment = schedule_sum(sched, "impairmentCurrent")
+
+print("PeriodImpairment:", PeriodImpairment)
+
+netImpairment = subtract(PeriodImpairment,priotImpairment)
+
+print("priotImpairment:", priotImpairment)
+print("netImpairment:", netImpairment)
+
+interestAccrual = schedule_first(sched, "interestAccrued")
+
+print("interestAccrual:", interestAccrual)
+
+
+createTransaction(postingdate, effectivedate, "Impairment_Gain", iif(gt(PeriodImpairment,0),PeriodImpairment,0), subinstrumentid='1')
+createTransaction(postingdate, effectivedate, "Impairment_Loss", iif(lt(netImpairment,0),netImpairment,0), subinstrumentid='1')
+createTransaction(postingdate, effectivedate, "Interest_Accrual", iif(eq(normalize_date(OriginationDate),normalize_date(postingdate)),0,interestAccrual), subinstrumentid='1')
+createTransaction(postingdate, effectivedate, "Origination_Principal", iif(eq(normalize_date(OriginationDate),normalize_date(postingdate)),LoanAmount,0), subinstrumentid='1')
