@@ -348,7 +348,7 @@ const Dashboard = ({ onSignOut }) => {
   };
 
   return (
-    <div className="flex h-screen bg-[#F8F9FA] overflow-x-hidden" data-testid="dashboard-container">
+    <div className="flex h-screen bg-[#F8F9FA] overflow-auto" style={{ minWidth: '1400px' }} data-testid="dashboard-container">
       {/* Left Sidebar */}
       <div className="sidebar-enter">
         <LeftSidebar 
