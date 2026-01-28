@@ -762,13 +762,16 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                             </TooltipContent>
                           </Tooltip>
                         </label>
-                        <Textarea
+                        <TextField
                           value={newFunction.formula}
                           onChange={(e) => setNewFunction(prev => ({ ...prev, formula: e.target.value }))}
                           placeholder="return principal * rate * time"
+                          multiline
                           rows={4}
-                          className="font-mono text-sm"
+                          fullWidth
+                          size="small"
                           data-testid="function-formula-input"
+                          InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
                         />
                         <div className="flex items-start gap-2 mt-2 p-2 bg-amber-50 rounded text-xs text-amber-700">
                           <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
