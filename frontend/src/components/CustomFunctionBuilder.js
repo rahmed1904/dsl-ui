@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
 import { Plus, Trash2, Save, X, Code, Brackets, FileCode, Info, ChevronDown, ChevronUp, Edit2, HelpCircle, BookOpen, Lightbulb } from "lucide-react";
-import { Button, Card, CardContent, TextField, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Button, Card, CardContent, TextField, Box, Chip, Tooltip, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 
 const API = '/api';
 
@@ -382,7 +382,22 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowDocumentation(!showDocumentation)}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  >
+                    <HelpCircle className="w-4 h-4 mr-1" />
+                    Help
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>View documentation on how to create functions</p>
+                </TooltipContent>
+              </Tooltip>
               <Button variant="ghost" size="icon" onClick={onClose} data-testid="close-function-builder">
                 <X className="w-5 h-5" />
               </Button>
@@ -435,8 +450,44 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                             <p className="text-xs text-slate-600 mt-1 line-clamp-1">{func.description}</p>
                           </div>
                           <div className="flex items-center gap-1">
-                            
-                            
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditFunction(func);
+                                  }}
+                                  data-testid={`edit-function-${func.name}`}
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit function</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteFunction(func.id, func.name);
+                                  }}
+                                  data-testid={`delete-function-${func.name}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete function</p>
+                              </TooltipContent>
+                            </Tooltip>
                             {expandedFunction === func.id ? (
                               <ChevronUp className="w-4 h-4 text-slate-400" />
                             ) : (
@@ -530,7 +581,10 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Function Name <span className="text-red-500">*</span>
-                          
+                          <Tooltip>
+                          <Tooltip title="Use snake_case: lowercase letters with underscores. Example: calculate_interest">
+                            <HelpCircle className="w-3 h-3 text-slate-400" />
+                          </Tooltip>
                         </label>
                         <TextField
                           value={newFunction.name}
@@ -549,7 +603,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Category
-                          
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-3 h-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Group your function for easier discovery in the function browser</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </label>
                         <select
                           value={newFunction.category}
@@ -567,7 +628,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Description <span className="text-red-500">*</span>
-                          
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-3 h-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Briefly explain what your function does</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </label>
                         <TextField
                           value={newFunction.description}
@@ -586,7 +654,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                         <div className="flex items-center justify-between mb-2">
                           <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
                             Parameters
-                            
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="w-3 h-3 text-slate-400" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Input values your function needs. Use descriptive names like 'principal', 'rate', 'periods'</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </label>
                           <Button 
                             variant="outline" 
@@ -612,7 +687,23 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                                 data-testid={`param-name-${index}`}
                                 InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
                               />
-                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <select
+                                    value={param.type}
+                                    onChange={(e) => handleParameterChange(index, 'type', e.target.value)}
+                                    className="w-24 border border-slate-200 rounded-md p-2 text-sm"
+                                    data-testid={`param-type-${index}`}
+                                  >
+                                    {RETURN_TYPES.map(type => (
+                                      <option key={type} value={type}>{type}</option>
+                                    ))}
+                                  </select>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>decimal: numbers, string: text, date: dates, boolean: true/false</p>
+                                </TooltipContent>
+                              </Tooltip>
                               {newFunction.parameters.length > 1 && (
                                 <Button 
                                   variant="ghost" 
@@ -632,7 +723,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Return Type
-                          
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-3 h-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>What type of value your function returns</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </label>
                         <select
                           value={newFunction.returnType}
@@ -650,7 +748,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Formula / Logic <span className="text-red-500">*</span>
-                          
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-3 h-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p>Write your calculation using parameter names. Start with 'return' for the result.</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </label>
                         <TextField
                           value={newFunction.formula}
@@ -676,7 +781,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                       <div>
                         <label className="text-sm font-medium text-slate-700 mb-1 flex items-center gap-1">
                           Example Usage (optional)
-                          
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-3 h-3 text-slate-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Show how to call your function with sample values</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </label>
                         <TextField
                           value={newFunction.example}
