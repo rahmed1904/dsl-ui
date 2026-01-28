@@ -63,12 +63,12 @@ const DSLExamples = ({ onLoadExample }) => {
             color={selectedCategory === category ? "primary" : "default"}
             sx={{ 
               cursor: 'pointer',
-              bgcolor: selectedCategory === category ? '#5B5FED' : '#FFFFFF',
+              bgcolor: selectedCategory === category ? '#14213D' : '#FFFFFF',
               color: selectedCategory === category ? '#FFFFFF' : '#495057',
               border: '1px solid',
-              borderColor: selectedCategory === category ? '#5B5FED' : '#CED4DA',
+              borderColor: selectedCategory === category ? '#14213D' : '#CED4DA',
               '&:hover': {
-                bgcolor: selectedCategory === category ? '#4346C8' : '#F8F9FA',
+                bgcolor: selectedCategory === category ? '#1D3557' : '#F8F9FA',
               }
             }}
             data-testid={`example-category-${category}`}
