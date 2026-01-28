@@ -592,8 +592,8 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
               width: '32px',
               p: 0,
               borderRadius: '8px',
-              bgcolor: '#5B5FED',
-              '&:hover': { bgcolor: '#4346C8' },
+              bgcolor: '#14213D',
+              '&:hover': { bgcolor: '#1D3557' },
               '&:disabled': { bgcolor: '#CED4DA', color: '#6C757D' }
             }}
           >
