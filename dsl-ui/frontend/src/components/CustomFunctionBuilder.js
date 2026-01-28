@@ -591,13 +591,15 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                             </TooltipContent>
                           </Tooltip>
                         </label>
-                        <Input
+                        <TextField
                           value={newFunction.name}
                           onChange={(e) => setNewFunction(prev => ({ ...prev, name: e.target.value.replace(/\s/g, '_') }))}
                           placeholder="my_custom_function"
-                          className="font-mono"
-                          disabled={!!editingFunction} // Disable name editing when updating
+                          size="small"
+                          fullWidth
+                          disabled={!!editingFunction}
                           data-testid="function-name-input"
+                          InputProps={{ sx: { fontFamily: 'monospace' } }}
                         />
                         <p className="text-xs text-slate-500 mt-1">Use lowercase with underscores (snake_case)</p>
                       </div>
