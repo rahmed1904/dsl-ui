@@ -397,13 +397,13 @@ const Dashboard = ({ onSignOut }) => {
                 data-testid="custom-function-builder-button"
                 startIcon={<Brackets className="w-4 h-4" />}
                 sx={{
-                  bgcolor: '#EEF0FE',
-                  borderColor: '#D4D6FA',
-                  color: '#5B5FED',
+                  bgcolor: '#14213D',
+                  borderColor: '#14213D',
+                  color: '#FFFFFF',
                   fontWeight: 500,
                   '&:hover': {
-                    bgcolor: '#E0E2FD',
-                    borderColor: '#5B5FED',
+                    bgcolor: '#1D3557',
+                    borderColor: '#1D3557',
                   },
                 }}
               >
