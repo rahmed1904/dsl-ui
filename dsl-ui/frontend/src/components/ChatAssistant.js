@@ -430,7 +430,7 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
       </div>
 
       {/* Messages - Copilot conversation style */}
-      <ScrollArea className="flex-1" ref={scrollRef}>
+      <Box sx={{ flex: 1, overflowY: 'auto' }} ref={scrollRef}>
         <div className="p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
