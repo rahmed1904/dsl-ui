@@ -642,11 +642,14 @@ const CustomFunctionBuilder = ({ onClose, onFunctionSaved }) => {
                             </TooltipContent>
                           </Tooltip>
                         </label>
-                        <Textarea
+                        <TextField
                           value={newFunction.description}
                           onChange={(e) => setNewFunction(prev => ({ ...prev, description: e.target.value }))}
                           placeholder="What does this function do?"
+                          multiline
                           rows={2}
+                          fullWidth
+                          size="small"
                           data-testid="function-description-input"
                         />
                       </div>
