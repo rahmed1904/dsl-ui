@@ -162,18 +162,39 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
                     {func.description}
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    onClick={() => {
-                      onInsertFunction(`${func.name}(${func.params})`);
-                      toast.success(`Inserted: ${func.name}()`);
-                    }}
-                    data-testid={`insert-${func.name}`}
-                  >
-                    Insert into Editor
-                  </Button>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ flex: 1 }}
+                      onClick={() => {
+                        onInsertFunction(`${func.name}(${func.params})`);
+                        toast.success(`Inserted: ${func.name}()`);
+                      }}
+                      data-testid={`insert-${func.name}`}
+                    >
+                      Insert into Editor
+                    </Button>
+                    {onAskAI && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                          onAskAI(`Explain how to use the ${func.name} function with examples. Parameters: ${func.params}. Description: ${func.description}`);
+                          onClose();
+                        }}
+                        startIcon={<Sparkles size={14} />}
+                        data-testid={`ask-ai-${func.name}`}
+                        sx={{
+                          bgcolor: '#14213D',
+                          color: '#FFFFFF',
+                          '&:hover': { bgcolor: '#1D3557' }
+                        }}
+                      >
+                        Ask AI
+                      </Button>
+                    )}
+                  </Box>
                 </CardContent>
               </Card>
             ))}
