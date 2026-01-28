@@ -17,6 +17,13 @@ const EventDataViewer = ({ onClose }) => {
     loadEventDataSummary();
   }, []);
 
+  // When summary is loaded and there's no selection, auto-select the first event
+  useEffect(() => {
+    if (eventDataSummary && eventDataSummary.length > 0 && !selectedEvent) {
+      loadEventData(eventDataSummary[0].event_name);
+    }
+  }, [eventDataSummary]);
+
   const loadEventDataSummary = async () => {
     try {
       const response = await axios.get(`${API}/event-data`);

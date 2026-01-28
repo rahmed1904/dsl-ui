@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Card, Collapse, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { FileText, Code2, RefreshCw, LogOut, ChevronDown, ChevronRight } from "lucide-react";
+import { FileText, Code2, RefreshCw, LogOut, ChevronDown, ChevronRight, Upload } from "lucide-react";
 import { useToast } from "./ToastProvider";
 
 const FYNTRAC_LOGO = "/logo.png";
@@ -37,7 +37,7 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
 
       <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
         <Box sx={{ mb: 3 }}>
-          <Card sx={{ bgcolor: '#EEF0FE', border: '1px solid #D4D6FA', p: 2 }}>
+            <Card sx={{ bgcolor: '#EEF0FE', border: '1px solid #D4D6FA', p: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
               <RefreshCw size={16} color="#5B5FED" />
               <Box component="span" sx={{ fontSize: '0.8125rem', fontWeight: 600, color: '#212529' }}>
@@ -45,18 +45,28 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
               </Box>
             </Box>
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={() => toast.info('Coming soon')}
               fullWidth
+              startIcon={<Upload size={14} color="#FFFFFF" />}
               data-testid="import-events-button"
               sx={{
                 fontSize: '0.8125rem',
-                borderColor: '#5B5FED',
-                color: '#5B5FED',
+                fontWeight: 600,
+                bgcolor: '#14213d',
+                borderColor: '#14213d',
+                color: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(20, 33, 61, 0.3)',
+                transition: 'all 0.15s ease',
                 '&:hover': {
-                  borderColor: '#4346C8',
-                  bgcolor: '#F8F9FE',
+                  bgcolor: '#1D3557',
+                  boxShadow: '0 6px 20px rgba(20, 33, 61, 0.4)',
+                  transform: 'translateY(-2px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0)',
+                  boxShadow: '0 2px 8px rgba(20, 33, 61, 0.3)'
                 },
               }}
             >

@@ -1,17 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
-import { Upload, FileText, FileSpreadsheet, Download, CheckCircle } from "lucide-react";
-import { Button, Card, CardContent, Box, Typography, LinearProgress } from '@mui/material';
+import { Upload, FileText, FileSpreadsheet, Download, CheckCircle, Eye } from "lucide-react";
+import { Button, Card, CardContent, Box, Typography, LinearProgress, IconButton, Tooltip } from '@mui/material';
 
 const API = '/api';
 
-const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog }) => {
+const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog, selectedEvent, onViewEvent }) => {
   const [eventFile, setEventFile] = useState(null);
   const [excelDataFile, setExcelDataFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [eventDataSummary, setEventDataSummary] = useState([]);
   const hasEvents = events && events.length > 0;
   const toast = useToast();
+
+  useEffect(() => {
+    const loadSummary = async () => {
+      try {
+        const resp = await axios.get(`${API}/event-data`);
+        setEventDataSummary(resp.data || []);
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadSummary();
+  }, [events]);
 
   const handleUploadEvents = async () => {
     if (!eventFile) {
@@ -124,15 +137,20 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog }) => {
                   Upload CSV file with event schemas
                 </Typography>
               </Box>
-              <Button
-                size="small"
-                onClick={handleDownloadEvents}
-                disabled={!hasEvents}
-                sx={{ minWidth: 'auto', p: 1 }}
-                data-testid="download-events-button"
-              >
-                <Download size={16} />
-              </Button>
+              <Tooltip title="Download">
+                <span>
+                  <Button
+                    size="small"
+                    onClick={handleDownloadEvents}
+                    disabled={!hasEvents}
+                    sx={{ minWidth: 'auto', p: 1 }}
+                    data-testid="download-events-button"
+                    aria-label="Download event definitions"
+                  >
+                    <Download size={16} />
+                  </Button>
+                </span>
+              </Tooltip>
             </Box>
             <Box sx={{ mb: 2 }}>
               <input
@@ -173,9 +191,25 @@ const FileUploadPanel = ({ onUploadSuccess, events, addConsoleLog }) => {
         <Card>
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ mb: 2.5 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                <FileSpreadsheet size={20} color="#4CAF50" />
-                <Typography variant="h5">Event Data (Excel)</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FileSpreadsheet size={20} color="#4CAF50" />
+                  <Typography variant="h5">Event Data (Excel)</Typography>
+                </Box>
+                <Tooltip title="View data">
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={() => { if (typeof onViewEvent === 'function' && selectedEvent) onViewEvent(selectedEvent); }}
+                      disabled={!(selectedEvent && eventDataSummary.some(it => it.event_name === selectedEvent && (it.row_count || 0) > 0))}
+                      data-testid="view-event-data-button"
+                      sx={{ color: '#5B5FED' }}
+                      aria-label="View event data"
+                    >
+                      <Eye size={16} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
                 Excel file with event data (each sheet = one event)

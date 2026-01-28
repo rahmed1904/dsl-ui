@@ -53,10 +53,11 @@ const Dashboard = ({ onSignOut }) => {
       return "## Welcome to Fyntac DSL Code Editor ##";
     }
   });
-  const [consoleOutput, setConsoleOutput] = useState([]);
+
   const [templates, setTemplates] = useState([]);
-  const [transactionReports, setTransactionReports] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState("");
+  const [consoleOutput, setConsoleOutput] = useState([]);
+  const [transactionReports, setTransactionReports] = useState([]);
   const [tabValue, setTabValue] = useState(0);
   const [showFunctionBrowser, setShowFunctionBrowser] = useState(false);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
@@ -351,7 +352,7 @@ const Dashboard = ({ onSignOut }) => {
   return (
     <div className="flex h-screen bg-[#F8F9FA] overflow-auto" style={{ minWidth: '1400px' }} data-testid="dashboard-container">
       {/* Left Sidebar */}
-      <div className="sidebar-enter">
+        <div className="sidebar-enter">
         <LeftSidebar 
           events={events} 
           selectedEvent={selectedEvent}
@@ -386,7 +387,12 @@ const Dashboard = ({ onSignOut }) => {
                   '&:hover': {
                     bgcolor: '#C3E6CB',
                     borderColor: '#B8DAFF',
+                    color: '#14213d',
+                    '& .MuiButton-startIcon svg': { color: '#14213d' },
                   },
+                  '&:active': { color: '#14213d' },
+                  '&.Mui-focusVisible': { color: '#14213d' },
+                  '& .MuiButton-startIcon svg': { color: '#155724' },
                 }}
               >
                 Browse Functions ({dslFunctions.length})
@@ -406,7 +412,12 @@ const Dashboard = ({ onSignOut }) => {
                   '&:hover': {
                     borderColor: '#ADB5BD',
                     bgcolor: '#F8F9FA',
+                    color: '#14213d',
+                    '& .MuiButton-startIcon svg': { color: '#14213d' },
                   },
+                  '&:active': { color: '#14213d' },
+                  '&.Mui-focusVisible': { color: '#14213d' },
+                  '& .MuiButton-startIcon svg': { color: '#495057' },
                 }}
               >
                 Settings
@@ -446,17 +457,7 @@ const Dashboard = ({ onSignOut }) => {
                   <Trash2 className="w-4 h-4 text-[#6C757D] mr-2" />
                   Clear All Data
                 </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setShowEventDataViewer(true);
-                    setSettingsAnchorEl(null);
-                  }}
-                  data-testid="menu-view-data"
-                  sx={{ fontSize: '0.875rem', py: 1.5 }}
-                >
-                  <Database className="w-4 h-4 text-[#6C757D] mr-2" />
-                  View Data
-                </MenuItem>
+                
               </Menu>
             </div>
           </div>
@@ -508,10 +509,12 @@ const Dashboard = ({ onSignOut }) => {
 
             <TabPanel value={tabValue} index={0}>
               <FileUploadPanel 
-                onUploadSuccess={loadEvents} 
-                events={events}
-                addConsoleLog={addConsoleLog}
-              />
+                  onUploadSuccess={loadEvents} 
+                  events={events}
+                  addConsoleLog={addConsoleLog}
+                  selectedEvent={selectedEvent}
+                  onViewEvent={(eventName) => { setSelectedEvent(eventName); setShowEventDataViewer(true); }}
+                />
             </TabPanel>
 
             <TabPanel value={tabValue} index={1}>
