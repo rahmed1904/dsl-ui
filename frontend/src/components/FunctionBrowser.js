@@ -94,10 +94,10 @@ const FunctionBrowser = ({ dslFunctions, onInsertFunction, onClose, onAskAI }) =
                 color={selectedCategory === category ? "primary" : "default"}
                 sx={{ 
                   cursor: 'pointer',
-                  bgcolor: selectedCategory === category ? '#5B5FED' : '#FFFFFF',
+                  bgcolor: selectedCategory === category ? '#14213D' : '#FFFFFF',
                   color: selectedCategory === category ? '#FFFFFF' : '#495057',
                   '&:hover': {
-                    bgcolor: selectedCategory === category ? '#4346C8' : '#F8F9FA',
+                    bgcolor: selectedCategory === category ? '#1D3557' : '#F8F9FA',
                   }
                 }}
                 data-testid={`category-${category}`}
