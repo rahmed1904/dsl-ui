@@ -12,7 +12,7 @@ import TemplatesPanel from "../components/TemplatesPanel";
 import TransactionReports from "../components/TransactionReports";
 import FunctionBrowser from "../components/FunctionBrowser";
 import DSLExamples from "../components/DSLExamples";
-import CustomFunctionBuilder from "../components/CustomFunctionBuilder";
+// import CustomFunctionBuilder from "../components/CustomFunctionBuilder";
 import EventDataViewer from "../components/EventDataViewer";
 
 // API URL - use relative path since setupProxy.js handles the forwarding
