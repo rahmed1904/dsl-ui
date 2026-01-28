@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Button, Card, CardContent, Collapse } from '@mui/material';
-import { FileText, Code2, RefreshCw, LogOut, ChevronDown } from "lucide-react";
+import { Box, Button, Card, Collapse, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { FileText, Code2, RefreshCw, LogOut, ChevronDown, ChevronRight } from "lucide-react";
 import { useToast } from "./ToastProvider";
 
 const FYNTRAC_LOGO = "/logo.png";
@@ -14,137 +14,157 @@ const LeftSidebar = ({ events, selectedEvent, onEventSelect, onDownloadEvents, o
   };
 
   return (
-    <div className="w-[280px] bg-white border-r border-slate-200 flex flex-col" data-testid="left-sidebar">
-      <div className="p-4 border-b border-slate-200 flex justify-center">
+    <Box 
+      sx={{ 
+        width: 280, 
+        bgcolor: '#FFFFFF', 
+        borderRight: '1px solid #E9ECEF', 
+        display: 'flex', 
+        flexDirection: 'column',
+        height: '100vh'
+      }} 
+      data-testid="left-sidebar"
+    >
+      <Box sx={{ p: 3, borderBottom: '1px solid #E9ECEF', display: 'flex', justifyContent: 'center' }}>
         <img
           src={process.env.PUBLIC_URL + '/logo.png'}
           alt="Fyntrac"
-          className="h-14 w-auto object-contain mx-auto"
+          style={{ height: 40, objectFit: 'contain' }}
           data-testid="sidebar-logo"
           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://customer-assets.emergentagent.com/job_code-finance-2/artifacts/hdj19r3w_Fyntrac%20%28600%20x%20400%20px%29%20%284%29.png'; }}
         />
-      </div>
+      </Box>
 
-      <Box sx={{ flex: 1, overflowY: 'auto' }}>
-        <div className="p-6 space-y-6">
-          {/* Event Configuration Section */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-slate-900 mb-3" style={{ fontFamily: 'Manrope' }}>
-              <RefreshCw className="w-4 h-4 inline-block mr-2 text-blue-600" />
-              Event Configuration
-            </h3>
+      <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+        <Box sx={{ mb: 3 }}>
+          <Card sx={{ bgcolor: '#EEF0FE', border: '1px solid #D4D6FA', p: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+              <RefreshCw size={16} color="#5B5FED" />
+              <Box component="span" sx={{ fontSize: '0.8125rem', fontWeight: 600, color: '#212529' }}>
+                Event Configuration
+              </Box>
+            </Box>
             <Button
-              variant="contained"
+              variant="outlined"
               size="small"
               onClick={() => toast.info('Coming soon')}
               fullWidth
               data-testid="import-events-button"
               sx={{
-                py: 1,
-                fontSize: '0.875rem',
-                bgcolor: '#dbeafe',
-                color: '#475569',
-                boxShadow: 'none',
+                fontSize: '0.8125rem',
+                borderColor: '#5B5FED',
+                color: '#5B5FED',
                 '&:hover': {
-                  bgcolor: '#bfdbfe',
-                  boxShadow: 'none',
+                  borderColor: '#4346C8',
+                  bgcolor: '#F8F9FE',
                 },
               }}
             >
               Import
             </Button>
-          </div>
+          </Card>
+        </Box>
 
-          {/* Events Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-4 h-4 text-blue-600" />
-              <h3 className="text-sm font-semibold text-slate-700" style={{ fontFamily: 'Manrope' }}>Events</h3>
-            </div>
-            {events.length === 0 ? (
-              <p className="text-xs text-slate-500">No events uploaded yet</p>
-            ) : (
-              <div className="space-y-2">
-                {events.map((event) => {
-                  const isExpanded = expandedEvent === event.event_name;
-                  return (
-                    <Card 
-                      key={event.id}
-                      sx={{
-                        p: 0,
-                        borderRadius: 2,
-                        border: selectedEvent === event.event_name ? '1px solid #2563eb' : '1px solid #e2e8f0',
-                        bgcolor: selectedEvent === event.event_name ? '#eff6ff' : 'white',
-                        transition: 'all 0.2s',
-                      }}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, px: 1 }}>
+            <FileText size={16} color="#5B5FED" />
+            <Box component="span" sx={{ fontSize: '0.8125rem', fontWeight: 600, color: '#495057' }}>Events</Box>
+          </Box>
+          {events.length === 0 ? (
+            <Box sx={{ px: 1, py: 2 }}>
+              <Box component="p" sx={{ fontSize: '0.75rem', color: '#6C757D', m: 0 }}>No events uploaded yet</Box>
+            </Box>
+          ) : (
+            <List sx={{ p: 0 }}>
+              {events.map((event) => {
+                const isExpanded = expandedEvent === event.event_name;
+                const isSelected = selectedEvent === event.event_name;
+                return (
+                  <Box key={event.id} sx={{ mb: 0.5 }}>
+                    <ListItemButton
+                      onClick={() => { toggleExpand(event.event_name); onEventSelect && onEventSelect(event.event_name); }}
+                      selected={isSelected}
                       data-testid={`event-${event.event_name}`}
+                      sx={{
+                        borderRadius: 1,
+                        py: 1,
+                        px: 1.5,
+                        '&.Mui-selected': {
+                          bgcolor: '#EEF0FE',
+                          '&:hover': {
+                            bgcolor: '#E0E2FD',
+                          },
+                        },
+                      }}
                     >
-                      <button
-                        className={`w-full text-left p-3 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50 ${isExpanded ? 'bg-slate-50' : ''}`}
-                        onClick={() => { toggleExpand(event.event_name); onEventSelect && onEventSelect(event.event_name); }}
-                        aria-expanded={isExpanded}
-                      >
-                        <div className="font-medium text-sm text-slate-900">{event.event_name}</div>
-                        <ChevronDown className={`w-4 h-4 text-slate-500 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                      </button>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={event.event_name} 
+                        primaryTypographyProps={{ 
+                          fontSize: '0.875rem', 
+                          fontWeight: isSelected ? 600 : 500,
+                          color: isSelected ? '#5B5FED' : '#495057'
+                        }}
+                      />
+                    </ListItemButton>
 
-                      <Collapse in={isExpanded} timeout="auto">
-                        <div className="px-3 py-3">
-                          <div className="space-y-1">
-                            <div className="text-xs text-slate-600 break-all">
-                              <span className="font-mono text-[11px] text-blue-600">• postingdate</span>
-                              <span className="ml-1 text-slate-400">(date)</span>
-                            </div>
-                            <div className="text-xs text-slate-600 break-all">
-                              <span className="font-mono text-[11px] text-blue-600">• effectivedate</span>
-                              <span className="ml-1 text-slate-400">(date)</span>
-                            </div>
-                            <div className="text-xs text-slate-600 break-all">
-                              <span className="font-mono text-[11px] text-blue-600">• subinstrumentid</span>
-                              <span className="ml-1 text-slate-400">(string)</span>
-                            </div>
-                            {event.fields.map((field, idx) => (
-                              <div key={idx} className="text-xs text-slate-600 break-all flex justify-between">
-                                <span className="font-mono text-[11px]">{field.name}</span>
-                                <span className="ml-1 text-slate-400">{`(${field.datatype})`}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </Collapse>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+                    <Collapse in={isExpanded} timeout="auto">
+                      <Box sx={{ pl: 5, pr: 1.5, py: 1.5 }}>
+                        <Box sx={{ fontSize: '0.75rem', color: '#6C757D', lineHeight: 1.6 }}>
+                          <Box sx={{ mb: 0.5 }}>
+                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• postingdate</Box>
+                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
+                          </Box>
+                          <Box sx={{ mb: 0.5 }}>
+                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• effectivedate</Box>
+                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(date)</Box>
+                          </Box>
+                          <Box sx={{ mb: 0.5 }}>
+                            <Box component="span" sx={{ fontFamily: 'monospace', color: '#5B5FED', fontWeight: 500 }}>• subinstrumentid</Box>
+                            <Box component="span" sx={{ color: '#ADB5BD', ml: 0.5 }}>(string)</Box>
+                          </Box>
+                          {event.fields.map((field, idx) => (
+                            <Box key={idx} sx={{ mb: 0.5, display: 'flex', justifyContent: 'space-between' }}>
+                              <Box component="span" sx={{ fontFamily: 'monospace', fontWeight: 500 }}>{field.name}</Box>
+                              <Box component="span" sx={{ color: '#ADB5BD' }}>({field.datatype})</Box>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                );
+              })}
+            </List>
+          )}
+        </Box>
       </Box>
 
-      {/* Sign Out Button at Bottom */}
-      <div className="p-4 border-t border-slate-200">
+      <Box sx={{ p: 2, borderTop: '1px solid #E9ECEF' }}>
         <Button 
           variant="outlined" 
           size="small" 
           onClick={onSignOut}
           fullWidth
-          startIcon={<LogOut className="w-4 h-4" />}
+          startIcon={<LogOut size={16} />}
           data-testid="signout-button"
           sx={{
             justifyContent: 'flex-start',
-            color: '#475569',
-            borderColor: '#e2e8f0',
+            color: '#6C757D',
+            borderColor: '#CED4DA',
             '&:hover': {
-              color: '#dc2626',
-              borderColor: '#fecaca',
-              bgcolor: '#fef2f2',
+              color: '#DC3545',
+              borderColor: '#F8D7DA',
+              bgcolor: '#FFF5F6',
             },
           }}
         >
           Sign Out
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
