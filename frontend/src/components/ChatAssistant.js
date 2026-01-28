@@ -389,23 +389,23 @@ const ChatAssistantComponent = ({ dslFunctions, events, onInsertCode, onOverwrit
             </div>
             <span className="text-13px font-medium text-slate-900">AI Assistant</span>
           </div>
-          <div className="flex items-center gap-1">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Button 
               variant="text" 
               size="small"
               onClick={() => setShowContext(!showContext)}
-              sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#64748b', '&:hover': { bgcolor: '#f1f5f9' } }}
+              sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', '&:hover': { bgcolor: '#F8F9FA' } }}
             >
-              {showContext ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+              {showContext ? <EyeOff size={14} /> : <Eye size={14} />}
             </Button>
             {messages.length > 0 && (
               <Button 
                 variant="text" 
                 size="small"
                 onClick={handleClearChat}
-                sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#64748b', '&:hover': { bgcolor: '#f1f5f9' } }}
+                sx={{ minWidth: 'auto', px: 0.75, py: 0.5, color: '#6C757D', '&:hover': { bgcolor: '#F8F9FA' } }}
               >
-                <RefreshCw className="w-3 h-3" />
+                <RefreshCw size={14} />
               </Button>
             )}
           </div>
