@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useToast } from "./ToastProvider";
 import { Plus, Trash2, Save, X, Code, Brackets, FileCode, Info, ChevronDown, ChevronUp, Edit2, HelpCircle, BookOpen, Lightbulb } from "lucide-react";
-import { Button, Card, CardContent, TextField, Box, Chip, Tooltip, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Button, Card, CardContent, TextField, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent } from '@mui/material';
 
 const API = '/api';
 
