@@ -687,12 +687,14 @@ const Dashboard = ({ onSignOut }) => {
         />
       )}
 
+      {/* CustomFunctionBuilder temporarily disabled due to Tooltip migration issues
       {showCustomFunctionBuilder && (
         <CustomFunctionBuilder 
           onClose={() => setShowCustomFunctionBuilder(false)}
           onFunctionSaved={loadDslFunctions}
         />
       )}
+      */}
 
       {showEventDataViewer && (
         <EventDataViewer 
