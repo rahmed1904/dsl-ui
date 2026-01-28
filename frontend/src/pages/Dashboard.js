@@ -28,7 +28,7 @@ function TabPanel({ children, value, index, ...other }) {
       hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
-      style={{ height: '100%', display: value === index ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}
+      style={{ height: '100%', display: value === index ? 'flex' : 'none', flexDirection: 'column', overflow: 'auto' }}
       {...other}
     >
       {value === index && (
@@ -361,7 +361,7 @@ const Dashboard = ({ onSignOut }) => {
   };
 
   const handleInsertFunction = (functionCall) => {
-    setDslCode(prev => prev + "\\n" + functionCall);
+    setDslCode(prev => prev + "\n" + functionCall);
   };
 
   const handleAskAIAboutFunction = (message) => {
@@ -709,7 +709,7 @@ const Dashboard = ({ onSignOut }) => {
               ref={chatAssistantRef}
               dslFunctions={dslFunctions} 
               events={events}
-              onInsertCode={(code) => setDslCode(prev => prev + "\\n" + code)}
+              onInsertCode={(code) => setDslCode(prev => prev + "\n" + code)}
               onOverwriteCode={(code) => setDslCode(code)}
               editorCode={dslCode}
               consoleOutput={consoleOutput}
