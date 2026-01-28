@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
+import { Card, CardContent, Button, Dialog, DialogTitle, DialogContent, IconButton, TextField, Select, MenuItem, Box, Typography, Chip, Table, TableHead, TableBody, TableRow, TableCell, Pagination } from '@mui/material';
 import { Download, FileText, Clock, Trash2, TrendingUp, X as CloseIcon } from "lucide-react";
 
 const PageSizeOptions = [10, 25, 50, 100];
@@ -194,14 +194,6 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
               size="small"
               fullWidth
             />
-            <Select 
-              value={pageSize} 
-              onChange={e => { setPageSize(parseInt(e.target.value, 10)); setPageIndex(0); }} 
-              size="small"
-              sx={{ minWidth: 120 }}
-            >
-              {PageSizeOptions.map(s => <MenuItem key={s} value={s}>{s} per page</MenuItem>)}
-            </Select>
           </Box>
 
           <Box sx={{ overflowX: 'auto' }}>
@@ -237,11 +229,23 @@ const TransactionReports = ({ reports, onDownloadReport, onDeleteReport }) => {
             <Typography variant="body2" color="text.secondary">
               Showing {filteredTransactions.length} transactions — page {pageIndex + 1} of {pageCount}
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button size="small" onClick={() => setPageIndex(0)} disabled={pageIndex === 0}>First</Button>
-              <Button size="small" onClick={() => setPageIndex(p => Math.max(0, p - 1))} disabled={pageIndex === 0}>Prev</Button>
-              <Button size="small" onClick={() => setPageIndex(p => Math.min(pageCount - 1, p + 1))} disabled={pageIndex >= pageCount - 1}>Next</Button>
-              <Button size="small" onClick={() => setPageIndex(pageCount - 1)} disabled={pageIndex >= pageCount - 1}>Last</Button>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Select 
+                value={pageSize} 
+                onChange={e => { setPageSize(parseInt(e.target.value, 10)); setPageIndex(0); }} 
+                size="small"
+                sx={{ minWidth: 120 }}
+              >
+                {PageSizeOptions.map(s => <MenuItem key={s} value={s}>{s} per page</MenuItem>)}
+              </Select>
+              <Pagination
+                count={pageCount}
+                page={pageIndex + 1}
+                onChange={(e, value) => setPageIndex(Math.max(0, value - 1))}
+                color="primary"
+                siblingCount={1}
+                boundaryCount={1}
+              />
             </Box>
           </Box>
         </DialogContent>
